@@ -22,6 +22,10 @@ At every gate: `[a]pprove` writes wiki files and continues, `[r]erun`
 re-runs the current step (old trajectory kept), `[e]dit` opens the
 draft in `$EDITOR`.
 
+Ollama Cloud gotcha: API keys from ollama.com/settings/keys are
+accepted WITHOUT the `oak-` label shown on the page — paste the bare
+token, or every call returns 401 Unauthorized.
+
 ## Expected artifacts
 
 ```text
