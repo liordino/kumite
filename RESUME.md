@@ -12,9 +12,11 @@ If a prior session was interrupted, start here.
 
 ## Pending work (in order)
 
-- [ ] Human: fill `.env` (copy `.env.example`; set `KUMITE_BASE_URL`,
-      `KUMITE_API_KEY`) and board models in `boards/software_squad.yaml`
-      (`SET_ME` / `SET_DIFFERENT_MODEL` / `SET_BEST_MODEL`).
+- [ ] Human: paste Ollama Cloud key into `.env` (already scaffolded at
+      `KUMITE_BASE_URL=https://ollama.com/v1`; get key at
+      https://ollama.com/settings/keys). Board models already filled.
+  - [ ] If a model 404s (Ollama retires cloud models), pick a live one:
+        `curl https://ollama.com/api/tags`.
 - [ ] `dotnet run --project src/Kumite.Cli -- baseline --idea Andante`
       → review → commit baseline result.
 - [ ] `dotnet run --project src/Kumite.Cli -- run --board software_squad --idea Andante`

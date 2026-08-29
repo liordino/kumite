@@ -25,6 +25,9 @@ public sealed class LlmClient
     {
         _config = config;
         _http = http ?? new HttpClient();
+        // Reasoning/thinking models (e.g. 120b+ on Ollama Cloud) can run well
+        // over HttpClient's default 100 s; 5 min covers them without hanging forever.
+        _http.Timeout = TimeSpan.FromMinutes(5);
         _http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {config.ApiKey}");
     }
 

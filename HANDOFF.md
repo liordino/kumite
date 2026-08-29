@@ -18,18 +18,16 @@ Status after autonomous build session. Triage time target: ~5 minutes.
   run: edit-approval, rerun attempt files, wiki paths, trajectory
   contents).
 
-## What is left (blocked on one human input, then ~15 min)
+## What is left (one human input, then ~15 min)
 
-1. **`.env` with a real key** — no `KUMITE_API_KEY` exists in this
-   environment, so the real-model loop has never executed. Copy
-   `.env.example` → `.env`, set `KUMITE_BASE_URL` + `KUMITE_API_KEY`.
-2. **Fill board models** — `boards/software_squad.yaml` still has
-   `SET_ME` / `SET_DIFFERENT_MODEL` / `SET_BEST_MODEL` placeholders
-   (deliberate human review point; reality_check must differ from
-   architect). Review persona prompts at the same time.
-3. Run the measured-improvement experiment (exact commands in
-   `REPRODUCING.md`), approve/edit at the gates.
-4. Commit `trajectories/{run-id}/`, `wiki/*`, `baseline-result.md`;
+1. **Paste your key into `.env`** (already scaffolded, gitignored):
+   create one at <https://ollama.com/settings/keys>, replace
+   `KUMITE_API_KEY=oak-PASTE_YOUR_KEY_HERE`. Endpoint and board models
+   are already set for Ollama Cloud (`https://ollama.com/v1`; gpt-oss:20b
+   / gpt-oss:120b / deepseek-v4-flash:0731 / qwen3.5:397b).
+2. Run the measured-improvement experiment (exact commands in
+   `REPRODUCING.md`), approve/edit at the 7 gates.
+3. Commit `trajectories/{run-id}/`, `wiki/*`, `baseline-result.md`;
    fill the scoring table in `RESULTS.md`.
 
 ## Files to touch first
@@ -37,12 +35,15 @@ Status after autonomous build session. Triage time target: ~5 minutes.
 - `MVP.md` — authoritative scope. Everything else interprets it.
 - `findings.md` — scope decisions/deviations (net9.0, gate ordering).
 - `src/Kumite.Cli/Engine.cs` — the state machine; start reading here.
-- `boards/software_squad.yaml` — prompts drafted, models pending.
+- `boards/software_squad.yaml` — models preset for Ollama Cloud;
+  prompts already agent-drafted.
 
 ## Known sharp edges
 
-- YamlDotNet maps empty flow sequences to null (fixed + regression-
-  guarded, but remember for new YAML fields).
+- YamlDotNet maps empty flow sequences (`[]`) to null, not empty list;
+  guarded in `BoardParser.Parse` with regression tests.
+- Ollama Cloud retires models over time; if a board model 404s, pick a
+  live one via `curl https://ollama.com/api/tags`.
 - Windows console: OS-thrown exceptions print localized text (pt-BR);
   runtime environment quirk only.
 - Trajectories use relative paths (`trajectories/`, `wiki/`) — run from
