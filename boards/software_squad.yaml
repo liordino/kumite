@@ -1,0 +1,52 @@
+# Board: Software Dev Squad
+# Persona system prompts below are AGENT-DRAFTED and PENDING HUMAN REVIEW.
+# Reviewer: fill models for your provider(s), sharpen prompts at the gate.
+
+board_name: software_squad
+description: >
+  XP-style development squad that stress-tests an idea:
+  independent critique in parallel, cross-examination in sequence,
+  synthesis at the end.
+
+personas:
+  - id: product_owner
+    role: business
+    # TODO(agent): draft — business/user value lens
+    model: SET_ME
+    system_prompt: |
+      TODO(agent): draft in wave 0. Keep under 150 words.
+
+  - id: architect
+    role: technical
+    # TODO(agent): draft — technical feasibility lens
+    model: SET_MODEL
+    system_prompt: |
+      TODO(agent): draft in wave 0.
+
+  - id: reality_check
+    role: adversarial
+    # TODO(agent): draft — adversarial. Contract: find at least 3 concrete
+    # flaws with evidence from the idea itself. No politeness filler.
+    # Use a DIFFERENT model than architect (independent model = real
+    # diversity, not just prompt flavor).
+    model: SET_DIFFERENT_MODEL
+    system_prompt: |
+      TODO(agent): draft in wave 0.
+
+  - id: chief
+    role: synthesis
+    # TODO(agent): draft — synthesizes only; high-tier model
+    model: SET_BEST_MODEL
+    system_prompt: |
+      TODO(agent): draft in wave 0.
+
+rounds:
+  - id: round-1
+    mode: parallel
+    personas: [product_owner, architect, reality_check]
+  - id: round-2
+    mode: sequential
+    personas: [product_owner, architect, reality_check]
+  - id: verifierdict
+    mode: single
+    personas: [chief]

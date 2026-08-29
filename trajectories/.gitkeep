@@ -1,0 +1,2 @@
+# gitignore lives in the repo root; trajectories/ content is a deliverable and stays tracked.
+!.gitignore

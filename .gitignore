@@ -1,0 +1,26 @@
+# --- .NET standard ---
+bin/
+obj/
+out/
+*.user
+*.suo
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+artifacts/
+TestResults/
+*.trx
+coverage*.xml
+*.coveragexml
+
+# --- Kumite ---
+# Secrets NEVER in git.
+.env
+# trajectories/ IS a deliverable — stays tracked (do not ignore).
+# Agent working notes in wiki/ from real runs are committed deliberately.
+
+# --- Misc ---
+.DS_Store
+Thumbs.db
