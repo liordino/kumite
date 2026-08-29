@@ -102,40 +102,41 @@ public sealed class Engine
         BoardRound round, string runId, Func<string, string> promptFor,
         IReadOnlyList<string> personaIds, CancellationToken ct)
     {
-        // Launch all personas in parallel (Task.WhenAll). Each persona still
-        // goes through its own gate before its result is committed.
+        // Launch all persona calls concurrently (Task.WhenAll); then gate
+        // them sequentially in board order so the console stays readable.
         if (round.Mode != RoundMode.Parallel)
             throw new InvalidOperationException($"Round '{round.Id}' is not parallel.");
 
-        var calls = personaIds.Select(async pid =>
+        var pending = new Dictionary<string, Task<LlmCall>>();
+        foreach (var pid in personaIds)
         {
             var persona = _board.Persona(pid);
-            var prompt = promptFor(pid);
+            pending[pid] = _llm.ChatAsync(persona.Model, persona.SystemPrompt, promptFor(pid), ct);
+        }
+
+        var results = new List<(string PersonaId, string Output)>();
+        foreach (var pid in personaIds)
+        {
+            var persona = _board.Persona(pid);
             var attempt = 0;
-            string currentOutput;
-            // First call happens concurrently; gate/rerun loop stays sequential per persona.
-            var pending = await _llm.ChatAsync(persona.Model, persona.SystemPrompt, prompt, ct);
+            var call = await pending[pid];
             while (true)
             {
                 attempt++;
-                var trajectory = _trajectories.Log(runId, round.Id, pid, pending, attempt);
+                var trajectory = _trajectories.Log(runId, round.Id, pid, call, attempt);
                 _out.WriteLine($"  trajectory: {trajectory}");
-                var gate = _gate.Ask($"{round.Id} / {pid}", pending.Content());
+                var gate = _gate.Ask($"{round.Id} / {pid}", call.Content());
                 if (gate.Choice == GateChoice.Rerun)
                 {
                     _out.WriteLine($"  [{round.Id}/{pid}] rerunning (attempt {attempt + 1})…");
-                    pending = await _llm.ChatAsync(persona.Model, persona.SystemPrompt, prompt, ct);
-                    continue;
+                    call = await _llm.ChatAsync(persona.Model, persona.SystemPrompt, promptFor(pid), ct);
+                    continue; // old trajectory kept; next attempt gets .attemptN.md
                 }
-                currentOutput = gate.Content;
+                results.Add((pid, gate.Content));
                 break;
             }
-            return (pid, currentOutput);
-        }).ToList();
-
-        var results = await Task.WhenAll(calls);
-        // Preserve board persona order in the wiki file.
-        return personaIds.Select(pid => results.First(r => r.pid == pid)).ToList()!;
+        }
+        return results;
     }
 
     public static string NewRunId() =>
