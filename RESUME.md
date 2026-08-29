@@ -10,20 +10,21 @@ If a prior session was interrupted, start here.
    everything shipped.
 3. `git log --oneline` — every commit is atomic and conventional.
 
-## Pending work (in order)
+## Status: all MVP waves DONE
 
-- [ ] Human: paste Ollama Cloud key into `.env` (already scaffolded at
-      `KUMITE_BASE_URL=https://ollama.com/v1`; get key at
-      https://ollama.com/settings/keys). Board models already filled.
-  - [ ] If a model 404s (Ollama retires cloud models), pick a live one:
-        `curl https://ollama.com/api/tags`.
-- [ ] `dotnet run --project src/Kumite.Cli -- baseline --idea Andante`
-      → review → commit baseline result.
-- [ ] `dotnet run --project src/Kumite.Cli -- run --board software_squad --idea Andante`
-      → approve/edit at each of the 7 gates → artifacts in `wiki/`,
-      trajectories in `trajectories/{run-id}/`.
-- [ ] Score both in `RESULTS.md` (table headers already there), commit.
-- [ ] Tick off the two pending deliverables in `CHANGELOG.md` wave 2.
+Waves 0, 0.1, 1 **and 2** are complete and committed. The measured-
+improvement experiment ran live on Ollama Cloud (run
+`20260829-134912-d3bb30c`): baseline 7/20 vs debate 19/20 — see
+[`RESULTS.md`](RESULTS.md). All MVP.md deliverables exist in this repo.
+
+## Remaining (human, optional)
+
+- [ ] Review the agent-assessed scores in `RESULTS.md` (rationale and
+      evidence links inline; override freely).
+- [ ] Optional re-runs: same commands, new run-id — old trajectories
+      are kept, so runs are comparable.
+- [ ] If a model 404s (Ollama retires cloud models), pick a live one:
+      `curl https://ollama.com/api/tags`, edit `boards/software_squad.yaml`.
 
 ## If tests fail
 
@@ -32,3 +33,5 @@ If a prior session was interrupted, start here.
   `BoardParser.Parse` (empty `[]` → null, not empty list).
 - Integration tests need a free loopback port (random 20000–65535);
   collisions are unlikely but possible.
+- If a live-model check is ever needed: `kumite baseline` is a single
+  cheap call — the connectivity smoke test.

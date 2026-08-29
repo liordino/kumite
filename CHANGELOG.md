@@ -25,6 +25,10 @@ Appendix; the top section is the challenge-format summary.
 - xUnit suite: board parsing, prompt builder, wiki paths, config, idea
   source, plus full-loop integration tests against a fake
   OpenAI-compatible endpoint (21 tests, all green).
+- Measured-improvement experiment executed live on Ollama Cloud
+  (run `20260829-134912-d3bb30c`): baseline vs 4-model debate scored
+  **7/20 vs 19/20** — full rationale + evidence links in RESULTS.md;
+  run artifacts (wiki + trajectories) committed by the engine itself.
 
 ### Fixed
 
@@ -53,6 +57,8 @@ Appendix; the top section is the challenge-format summary.
   (round 1 parallel + trajectory logging) → gates + wiki + git commits →
   round 2 sequential → verdict → CLI wiring → baseline command.
   Integration tests prove the whole loop against a fake endpoint.
-- **Wave 2 (open)** — real-model run pending human `.env` key only
-  (endpoint + models now pre-configured for Ollama Cloud);
-  trajectories/ deliverable + RESULTS.md table follow that run.
+- **Wave 2 — COMPLETE.** Real-model loop executed end-to-end on Ollama
+  Cloud (baseline + 7-gated debate). Artifacts committed by the run
+  itself (`kumite run …: approved wiki artifacts + trajectories`);
+  scores published in RESULTS.md; oak- key gotcha documented in
+  REPRODUCING.md/.env.example.

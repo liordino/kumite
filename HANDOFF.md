@@ -18,17 +18,22 @@ Status after autonomous build session. Triage time target: ~5 minutes.
   run: edit-approval, rerun attempt files, wiki paths, trajectory
   contents).
 
-## What is left (one human input, then ~15 min)
+## Status: COMPLETE — all MVP deliverables shipped
 
-1. **Paste your key into `.env`** (already scaffolded, gitignored):
-   create one at <https://ollama.com/settings/keys>, replace
-   `KUMITE_API_KEY=oak-PASTE_YOUR_KEY_HERE`. Endpoint and board models
-   are already set for Ollama Cloud (`https://ollama.com/v1`; gpt-oss:20b
-   / gpt-oss:120b / deepseek-v4-flash:0731 / qwen3.5:397b).
-2. Run the measured-improvement experiment (exact commands in
-   `REPRODUCING.md`), approve/edit at the 7 gates.
-3. Commit `trajectories/{run-id}/`, `wiki/*`, `baseline-result.md`;
-   fill the scoring table in `RESULTS.md`.
+Waves 0, 0.1, 1, 2 are done and committed. The measured-improvement
+experiment ran live on Ollama Cloud (run `20260829-134912-d3bb30c`):
+baseline **7/20** vs debate **19/20**, scored in `RESULTS.md` with
+evidence links. All MVP.md deliverables checked:
+
+- src + CHANGELOG — done
+- REPRODUCING.md — done (incl. the Ollama `oak-` key gotcha)
+- trajectories/ from a real full run — committed (7 calls, full
+  request + verbatim response each)
+- baseline + kumite result tables — RESULTS.md
+
+Human follow-ups (optional): review agent-assessed scores in
+RESULTS.md; sharpen persona prompts/models at a future gate (edit the
+board; no rebuild needed).
 
 ## Files to touch first
 
@@ -37,6 +42,7 @@ Status after autonomous build session. Triage time target: ~5 minutes.
 - `src/Kumite.Cli/Engine.cs` — the state machine; start reading here.
 - `boards/software_squad.yaml` — models preset for Ollama Cloud;
   prompts already agent-drafted.
+- `RESULTS.md` — the published experiment table.
 
 ## Known sharp edges
 
@@ -44,6 +50,8 @@ Status after autonomous build session. Triage time target: ~5 minutes.
   guarded in `BoardParser.Parse` with regression tests.
 - Ollama Cloud retires models over time; if a board model 404s, pick a
   live one via `curl https://ollama.com/api/tags`.
+- Ollama keys: paste WITHOUT the `oak-` label (401 otherwise) —
+  documented in REPRODUCING.md.
 - Windows console: OS-thrown exceptions print localized text (pt-BR);
   runtime environment quirk only.
 - Trajectories use relative paths (`trajectories/`, `wiki/`) — run from
