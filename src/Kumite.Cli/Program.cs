@@ -31,7 +31,8 @@ try
             return 2;
     }
 }
-catch (Exception ex) when (ex is InvalidOperationException or FileNotFoundException)
+catch (Exception ex) when (ex is InvalidOperationException or FileNotFoundException
+    or HttpRequestException or TaskCanceledException)
 {
     Console.Error.WriteLine($"error: {ex.Message}");
     return 1;

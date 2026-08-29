@@ -48,15 +48,17 @@ public static class BoardParser
             .WithNamingConvention(UnderscoredNamingConvention.Instance)
             .IgnoreUnmatchedProperties()
             .Build();
-        var dto = deserializer.Deserialize<RootDto>(yaml);
+        var dto = deserializer.Deserialize<RootDto>(yaml)
+            ?? throw new InvalidOperationException("Board file is empty or invalid YAML.");
 
-        var personas = dto.Personas.Select(p =>
-            new Persona(p.Id, p.Role, p.Model, p.SystemPrompt.Trim())).ToList();
+        // YamlDotNet deserializes empty flow sequences ([]) as null.
+        var personas = (dto.Personas ?? []).Select(p =>
+            new Persona(p.Id, p.Role, p.Model, (p.SystemPrompt ?? "").Trim())).ToList();
 
         var knownIds = personas.Select(p => p.Id).ToHashSet();
-        var rounds = dto.Rounds.Select(r =>
+        var rounds = (dto.Rounds ?? []).Select(r =>
         {
-            foreach (var pid in r.Personas)
+            foreach (var pid in r.Personas ?? [])
             {
                 if (!knownIds.Contains(pid))
                     throw new InvalidOperationException(
@@ -70,7 +72,7 @@ public static class BoardParser
                 var other => throw new InvalidOperationException(
                     $"Round '{r.Id}' has unknown mode '{other}'."),
             };
-            return new BoardRound(r.Id, mode, r.Personas);
+            return new BoardRound(r.Id, mode, r.Personas ?? []);
         }).ToList();
 
         if (personas.Count == 0 || rounds.Count == 0)
