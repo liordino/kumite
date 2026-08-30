@@ -14,15 +14,23 @@ public sealed class Gate
 {
     private readonly TextReader _input;
     private readonly TextWriter _output;
+    private readonly bool _auto;
 
-    public Gate(TextReader? input = null, TextWriter? output = null)
+    public Gate(TextReader? input = null, TextWriter? output = null, bool auto = false)
     {
         _input = input ?? Console.In;
         _output = output ?? Console.Out;
+        _auto = auto;
     }
 
     public GateResult Ask(string stepName, string draft)
     {
+        if (_auto)
+        {
+            _output.WriteLine($"GATE — {stepName}: auto-approved (--auto)");
+            return new GateResult(GateChoice.Approve, draft);
+        }
+
         _output.WriteLine();
         _output.WriteLine(new string('=', 70));
         _output.WriteLine($"GATE — {stepName}");

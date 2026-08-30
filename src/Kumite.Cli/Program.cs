@@ -9,6 +9,7 @@ if (args.Length == 0)
         usage:
           kumite init                                          scaffold wiki/, trajectories/, boards/, .env.example, .gitignore
           kumite run --board <name> --idea <text-or-file>      full debate (gates at every step)
+          kumite run --board <name> --idea <...> --auto        unattended mode: auto-approve every gate
           kumite run --board <name> --idea <...> --no-round2   kill switch: skip round 2
           kumite baseline --idea <text-or-file>                single LLM prompt, no debate
         """);
@@ -62,10 +63,11 @@ static int Init(TextWriter output)
     return 0;
 }
 
-static (string? Board, string? Idea, bool NoRound2) ParseArgs(string[] args)
+static (string? Board, string? Idea, bool NoRound2, bool Auto) ParseArgs(string[] args)
 {
     string? board = null, idea = null;
     var noRound2 = false;
+    var auto = false;
     for (var i = 0; i < args.Length; i++)
     {
         switch (args[i])
@@ -79,11 +81,14 @@ static (string? Board, string? Idea, bool NoRound2) ParseArgs(string[] args)
             case "--no-round2":
                 noRound2 = true;
                 break;
+            case "--auto":
+                auto = true;
+                break;
             default:
                 throw new InvalidOperationException($"unknown argument '{args[i]}'");
         }
     }
-    return (board, idea, noRound2);
+    return (board, idea, noRound2, auto);
 }
 
 static (string BoardPath, string Idea) RequireRunInputs(string? board, string? idea)
@@ -100,14 +105,14 @@ static (string BoardPath, string Idea) RequireRunInputs(string? board, string? i
 
 static async Task<int> RunAsync(string[] args, TextWriter output)
 {
-    var (board, idea, noRound2) = ParseArgs(args);
+    var (board, idea, noRound2, auto) = ParseArgs(args);
     var (boardPath, resolvedIdea) = RequireRunInputs(board, idea);
 
     var config = Config.Load();
     var parsed = BoardParser.LoadFile(boardPath);
     var engine = new Engine(parsed,
         new LlmClient(config),
-        new Gate(),
+        new Gate(auto: auto),
         new Wiki(),
         new TrajectoryLogger(),
         new GitSink(),
@@ -120,7 +125,7 @@ static async Task<int> RunAsync(string[] args, TextWriter output)
 
 static async Task<int> BaselineAsync(string[] args, TextWriter output)
 {
-    var (_, idea, _) = ParseArgs(args);
+    var (_, idea, _, _) = ParseArgs(args);
     if (string.IsNullOrWhiteSpace(idea))
         throw new InvalidOperationException("--idea is required (text or file path)");
     var resolvedIdea = IdeaSource.Resolve(idea);

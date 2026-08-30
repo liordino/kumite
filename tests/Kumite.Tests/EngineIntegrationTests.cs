@@ -86,6 +86,71 @@ public sealed class EngineIntegrationTests : IDisposable
           - { id: verdict, mode: single, personas: [chief] }
         """);
 
+    /// <summary>Any read attempt throws — proves --auto never touches stdin.</summary>
+    private sealed class ThrowingReader : TextReader
+    {
+        public override string? ReadLine() =>
+            throw new InvalidOperationException("--auto mode must never read stdin.");
+        public override int Read() =>
+            throw new InvalidOperationException("--auto mode must never read stdin.");
+    }
+
+    [Fact]
+    public async Task Auto_run_completes_end_to_end_without_stdin_reads()
+    {
+        ServeFakeOpenAi();
+        var config = new Config(_url.TrimEnd('/'), "fake-key");
+        var log = new StringWriter();
+        // --auto: stdin reader throws on any access; run must still complete.
+        var gate = new Gate(new ThrowingReader(), log, auto: true);
+
+        var engine = new Engine(TestBoard(), new LlmClient(config), gate,
+            new Wiki(Path.Combine(_root, "wiki")),
+            new TrajectoryLogger(Path.Combine(_root, "trajectories")),
+            new GitSink(log),
+            includeRound2: true,
+            log);
+
+        await engine.RunAsync("run-auto", "Andante idea under test");
+
+        var wiki = Path.Combine(_root, "wiki");
+        Assert.True(File.Exists(Path.Combine(wiki, "idea-run-auto.md")));
+        Assert.True(File.Exists(Path.Combine(wiki, "round-1-run-auto.md")));
+        Assert.True(File.Exists(Path.Combine(wiki, "round-2-run-auto.md")));
+        Assert.True(File.Exists(Path.Combine(wiki, "verdict-run-auto.md")));
+        // Trajectories identical in shape to a supervised run.
+        var traj = Path.Combine(_root, "trajectories", "run-auto");
+        Assert.Equal(2, Directory.GetFiles(Path.Combine(traj, "round-1")).Length);
+        Assert.Equal(2, Directory.GetFiles(Path.Combine(traj, "round-2")).Length);
+        Assert.Single(Directory.GetFiles(Path.Combine(traj, "verdict")));
+        // One-line auto-approved note per gate (5 gates: 2 r1 + 2 r2 + 1 verdict).
+        var autoNotes = log.ToString().Split('\n')
+            .Count(l => l.Contains("auto-approved", StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(5, autoNotes);
+    }
+
+    /// <summary>Blocks forever on read — simulates a human who never answers.</summary>
+    private sealed class BlockingReader : TextReader
+    {
+        public override string? ReadLine()
+        {
+            Task.Delay(Timeout.Infinite).Wait();
+            return null;
+        }
+    }
+
+    [Fact]
+    public async Task Supervised_gate_blocks_when_no_input_is_available()
+    {
+        // Without --auto, a gate with no stdin answer must NOT approve itself.
+        var log = new StringWriter();
+        var gate = new Gate(new BlockingReader(), log);
+        var ask = Task.Run(() => gate.Ask("verdict", "draft"));
+        await Task.WhenAny(ask, Task.Delay(TimeSpan.FromSeconds(1)));
+        Assert.False(ask.IsCompleted, "supervised gate auto-approved without input");
+        Assert.Contains("[a]pprove", log.ToString());
+    }
+
     [Fact]
     public async Task Full_run_produces_all_wiki_and_trajectory_artifacts()
     {
