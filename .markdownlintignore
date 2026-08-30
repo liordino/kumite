@@ -1,0 +1,4 @@
+# Run artifacts (wiki/, trajectories/) are immutable experiment evidence,
+# authored verbatim by LLM runs and engine commits. Never lint/autofix them.
+wiki/
+trajectories/

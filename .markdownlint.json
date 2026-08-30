@@ -1,0 +1,4 @@
+{
+  "comment": "Artifact protection: wiki/ and trajectories/ contain immutable run evidence (verbatim LLM output). All rules disabled so autofix never rewrites history.",
+  "default": false
+}
