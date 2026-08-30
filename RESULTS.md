@@ -78,13 +78,17 @@ core-loop spec. Executed **fully supervised**: a human decision at
 every gate. **This is the official measured-improvement table; scores
 are filled in by the human reviewer, not the agent.**
 
-| Dimension             | Baseline (1–5) | Kumite verdict (1–5) |
-| --------------------- | -------------- | -------------------- |
-| Flaws identified      |                |                      |
-| Spec completeness     |                |                      |
-| Actionability         |                |                      |
-| Perspective diversity |                |                      |
-| **Total**             |                |                      |
+| Dimension             | Baseline (1–5)   | Kumite verdict (1–5) |
+| --------------------- | ---------------- | -------------------- |
+| Flaws identified      | 4                | 5                    |
+| Spec completeness     | 3                | 4                    |
+| Actionability         | 4                | 5                    |
+| Perspective diversity | 2                | 5                    |
+| **Total**             | **13 / 20**      | **19 / 20**          |
+
+> Run #2 scores assigned by the human reviewer after reading both
+> artifacts in full (post-tag co-sign; see HANDOFF.md). Agent filled
+> no score cells.
 
 ### Run #2 artifact links
 
@@ -103,3 +107,36 @@ are filled in by the human reviewer, not the agent.**
   a stronger model.
 - Run #2 was executed **supervised** (human decision at all 7 gates);
   run #1 was executed **unattended**.
+
+### Run #2 scoring rationale
+
+**Kumite (19/20):** Flaws 5 — six substantive findings across two rounds,
+each cited from the idea text or the emerging proposal: "the batch is a
+fiction" (RSS cadence), "cold start is the product," the attention/
+retention contradiction, the unmeasurable value hypothesis ("with what
+instrument?" — no telemetry in a local-first design), and the
+friction-contradiction in the Architect's mitigation. Completeness 4 —
+verdict artifact with survived/risks/attributed disagreement and five
+ordered actions; cold-start curation remains honestly unresolved.
+Actionability 5 — ordered, gated ("before coding the client"), incl. a
+5-user concierge test. Diversity 5 — three lenses across three model
+families, cross-examination that caught claims the single voice never
+had to defend, with explicit attribution of who was more convincing.
+
+### Baseline rationale (single qwen3.5:397b call, same model as the Chief)
+
+- Flaws 4 — five real flaws (relevance paradox, cadence mismatch,
+  local-first+LLM trilemma, done-state FOMO, sustainability). Strong,
+  but static: it critiques the idea without ever proposing a design,
+  so it cannot be caught asserting unmeasurable claims.
+- Completeness 3 — a thorough gap table ("a manifesto, not a
+  specification") but produces no artifact.
+- Actionability 4 — six concrete actions, incl. a heuristic-only
+  batching script; strong but unprioritized against a validation path.
+- Diversity 2 — one voice performing three perspectives; no counter-
+  examination, no attribution, no external check on its own assertions.
+
+Note: baseline = same model as the Chief (qwen3.5:397b). The delta is
+the workflow, not the model. Trade-off disclosed: the debate costs
+~7 calls vs. 1 — the improvement is bought with human judgment time,
+which is the product's thesis.
