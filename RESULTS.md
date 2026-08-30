@@ -90,6 +90,53 @@ are filled in by the human reviewer, not the agent.**
 > artifacts in full (post-tag co-sign; see HANDOFF.md). Agent filled
 > no score cells.
 
+Idea: ideas/andante.md (the author's own real project).
+Baseline: single qwen3.5:397b call — same model as the Chief, so the
+delta is the workflow, not the model. Run #2 executed supervised at
+every gate; run #1 executed unattended.
+
+**Kumite rationale:** Flaws 5 — round-1 findings cited from the idea
+text ("the batch is a fiction," "cold start is the product, and you
+admit you haven't built it," the attention/retention contradiction);
+round-2 added findings only a cross-examination can produce: the
+claimed ≥40%/70% metrics are unmeasurable in a no-telemetry local-first
+design ("with what instrument?"), and the Architect's "high-priority
+feed list" mitigation contradicts the idea's own "friction must stay
+near zero." Completeness 4 — the verdict artifact separates what
+survived from what is unresolved, with explicit attribution of who was
+more convincing; cold-start curation is honestly left open. Actionability
+5 — five ordered, gated actions, including a 5-user concierge test
+before writing the client. Diversity 5 — three lenses across three model
+families; disagreement surfaced and attributed ("Reality Check was more
+convincing here").
+
+**Baseline rationale:** Flaws 4 — five substantive flaws sourced from
+the idea text (relevance paradox, cadence mismatch, local-first+LLM
+trilemma, done-state FOMO inversion, sustainability). It also caught
+one angle the debate missed (open-source abandonware) — noted for
+completeness; the debate complements singular review, it does not
+replace it. Capped at 4 because the critique is static: it never
+proposes a design, so no claim of its own is ever stress-tested.
+Completeness 3 — the "a manifesto, not a specification" gap table is
+strong diagnosis, but the output remains critique; nothing is resolved.
+Actionability 4 — six concrete actions including a heuristic-only
+batching script and a 10-user interview on the daily constraint, but
+unprioritized against a validation path and silent on the measurement
+problem its own critiques create. Diversity 2 — one voice performing
+three perspectives; no cross-examination, no attribution, no external
+check on its own assertions.
+
+Human-reviewed by Liordino. Trade-off disclosed: the debate costs
+~7 LLM calls + human gates where the baseline costs 1.
+Human-reviewed by Liordino, 2026-08-31.
+
+The baseline uniquely caught the open-source sustainability/abandonware
+risk that the full debate did not surface — both documents are
+committed; the debate complements, not replaces, careful singular
+review.
+
+LLM interaction evidence index: [trajectories/README.md](trajectories/README.md)
+
 ### Run #2 artifact links
 
 - Baseline (single call, same idea file): [`wiki/baseline-result-run2.md`](wiki/baseline-result-run2.md)

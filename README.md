@@ -47,6 +47,7 @@ debate) so you can score the measured-improvement table.
 - [docs/](docs/) — architecture notes
 - [REPRODUCING.md](REPRODUCING.md) — how to reproduce the experiment
 - [CHANGELOG.md](CHANGELOG.md) — kata-wave development log
+- [trajectories/README.md](trajectories/README.md) — LLM interaction evidence index
 
 ## License
 
