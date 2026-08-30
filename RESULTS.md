@@ -1,9 +1,19 @@
 # Results — measured improvement experiment
 
-Score each output 1–5 (higher better). One table, published per MVP.md.
+Score each output 1–5 (higher better). One table per run, published
+per MVP.md. Runs 1 and 2 used **different idea inputs** (see
+REPRODUCING.md §Two runs); the tables are not directly comparable.
+
+## Run #1 (exhibit)
 
 Idea used: **Andante** (title-only submission — intentionally under-
 specified, per MVP.md §measured improvement experiment).
+
+Run #1 was executed **unattended** (gates driven by the autonomous
+build session) and is kept as a **failure-mode exhibit**: how the
+board behaves when the "idea" is only a product name. **Agent-assessed
+scores** — retained as originally recorded, not the official
+measurement.
 
 | Dimension             | Baseline (1–5) | Kumite verdict (1–5) |
 | --------------------- | -------------- | -------------------- |
@@ -16,9 +26,9 @@ specified, per MVP.md §measured improvement experiment).
 > Scores below are **agent-assessed** from the committed artifacts;
 > human review and overrides welcome — the evidence links are inline.
 
-## Scoring rationale
+### Scoring rationale (run #1, agent-assessed)
 
-### Baseline — `wiki/baseline-result.md` (single qwen3.5:397b prompt)
+#### Baseline — `wiki/baseline-result.md` (single qwen3.5:397b prompt)
 
 - **Flaws 3** — correctly identified the meta-flaw ("a product name is
   not a specification"), but the analysis terminated there; no flaws
@@ -30,7 +40,7 @@ specified, per MVP.md §measured improvement experiment).
 - **Perspective diversity 1** — one generic evaluator voice, no
   opposing views, no self-critique.
 
-### Kumite — `wiki/verdict-20260829-134912-d3bb30c.md` (4-model debate)
+#### Kumite — `wiki/verdict-20260829-134912-d3bb30c.md` (4-model debate)
 
 - **Flaws 5** — cited, person-specific flaws *inside* the concrete
   interpretation: fabricated user segments ("phantoms"), Likert-survey
@@ -54,9 +64,28 @@ specified, per MVP.md §measured improvement experiment).
   segments are phantoms"; "product_owner was more convincing on
   defining a concrete, buildable slice in Round 2").
 
-## Links to artifacts
+### Links to artifacts (run #1)
 
 - Baseline: [`wiki/baseline-result.md`](wiki/baseline-result.md)
 - Full debate: [`wiki/verdict-20260829-134912-d3bb30c.md`](wiki/verdict-20260829-134912-d3bb30c.md) · [`wiki/round-1-…md`](wiki/round-1-20260829-134912-d3bb30c.md) · [`wiki/round-2-…md`](wiki/round-2-20260829-134912-d3bb30c.md)
 - Raw evidence (full request + verbatim response per call):
   [`trajectories/20260829-134912-d3bb30c/`](trajectories/20260829-134912-d3bb30c/)
+
+## Run #2 (official)
+
+Idea used: [`ideas/andante.md`](ideas/andante.md) — full problem/user/
+core-loop spec. Executed **fully supervised**: a human decision at
+every gate. **This is the official measured-improvement table; scores
+are filled in by the human reviewer, not the agent.**
+
+| Dimension             | Baseline (1–5) | Kumite verdict (1–5) |
+| --------------------- | -------------- | -------------------- |
+| Flaws identified      |                |                      |
+| Spec completeness     |                |                      |
+| Actionability         |                |                      |
+| Perspective diversity |                |                      |
+| **Total**             |                |                      |
+
+### Run #2 artifact links
+
+_(to be filled after run #2 executes)_
