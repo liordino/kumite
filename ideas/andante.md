@@ -3,7 +3,7 @@
 ## Problem
 Feed readers optimize for throughput, which turns consumption into
 doom-scrolling: users either fall behind or binge. Andante's bet:
-deliver feeds a a small daily batch, curated for relevance — a digest,
+deliver feeds a small daily batch, curated for relevance — a digest,
 not a stream — with explicit "done for today" closure. No infinite
 scroll, no unread counter.
 
