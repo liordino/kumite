@@ -34,12 +34,22 @@ implemented. Items are ordered newest-first inside each section.
   no code automates scoring (aligned with "do NOT call an LLM to
   compute anything code can compute" and YAGNI).
 
+## In progress this session (sanctioned)
+
+- **`--auto` gate-bypass mode** — sanctioned as the ONE code addition
+  of the submission session. Motivation: run #1 had to be driven
+  unattended through all 7 gates; `--auto` makes that a documented
+  mode (auto-approve every gate, identical artifacts/commit behavior,
+  never reads stdin) instead of an ad-hoc harness. Unattended smoke
+  test / demonstration mode only — NOT used for the official
+  measurement run (run #2 is fully supervised).
+
 ## Environment constraints encountered
 
-- No `OPENROUTER_API_KEY` present in this environment → the full
-  real-model run (trajectories/ deliverable) must be executed by a
-  human with a `.env` key. Engine loop fully proven via fake-endpoint
-  integration tests (7/7 gate steps: see EngineIntegrationTests).
+- ~~No `OPENROUTER_API_KEY` present in this environment~~ **RESOLVED**:
+  a working key (Ollama Cloud) is present in local `.env`; run #1
+  executed against it and run #2 will too. The earlier note about the
+  real-model run being human-pending is superseded.
 - Windows locale → runtime exception text prints in Portuguese; our
   own messages are English (conventional-commits/repo rule holds for
   committed files).
