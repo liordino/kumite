@@ -28,6 +28,11 @@ dotnet run --project src/Kumite.Cli -- run --board software_squad --idea ideas/a
   fully-specified idea file (`ideas/andante.md`), executed fully
   supervised (human decision at every gate). Scores in RESULTS.md.
 
+`kumite run --auto` is available as an unattended smoke test /
+demonstration mode (auto-approves every gate, identical artifacts and
+git commits) — **not used for the published measurement**: run #2 was
+executed supervised, run #1 unattended.
+
 At every gate: `[a]pprove` writes wiki files and continues, `[r]erun`
 re-runs the current step (old trajectory kept), `[e]dit` opens the
 draft in `$EDITOR`.
