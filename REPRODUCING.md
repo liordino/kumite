@@ -14,9 +14,19 @@ dotnet run --project src/Kumite.Cli -- init
 
 ```bash
 # Measured-improvement experiment:
-dotnet run --project src/Kumite.Cli -- baseline --idea Andante
-dotnet run --project src/Kumite.Cli -- run --board software_squad --idea Andante
+dotnet run --project src/Kumite.Cli -- baseline --idea ideas/andante.md
+dotnet run --project src/Kumite.Cli -- run --board software_squad --idea ideas/andante.md
 ```
+
+## Two runs
+
+- **Run #1** (`20260829-134912-d3bb30c`) — title-only stress test:
+  the idea input was the bare word "Andante". Kept as a failure-mode
+  exhibit (the debate had to invent the product from a name; see the
+  run-1 section in RESULTS.md and its trajectories).
+- **Run #2** — the official measured-improvement run: a real,
+  fully-specified idea file (`ideas/andante.md`), executed fully
+  supervised (human decision at every gate). Scores in RESULTS.md.
 
 At every gate: `[a]pprove` writes wiki files and continues, `[r]erun`
 re-runs the current step (old trajectory kept), `[e]dit` opens the
