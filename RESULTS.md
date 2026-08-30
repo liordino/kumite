@@ -88,4 +88,18 @@ are filled in by the human reviewer, not the agent.**
 
 ### Run #2 artifact links
 
-_(to be filled after run #2 executes)_
+- Baseline (single call, same idea file): [`wiki/baseline-result-run2.md`](wiki/baseline-result-run2.md)
+- Full debate: [`wiki/verdict-20260830-221525-0390216.md`](wiki/verdict-20260830-221525-0390216.md) · [`wiki/round-1-…md`](wiki/round-1-20260830-221525-0390216.md) · [`wiki/round-2-…md`](wiki/round-2-20260830-221525-0390216.md)
+- Raw evidence (full request + verbatim response per call):
+  [`trajectories/20260830-221525-0390216/`](trajectories/20260830-221525-0390216/)
+
+### Run #2 comparison note (facts, not scores)
+
+- Baseline and debate consumed the **same idea file**
+  (`ideas/andante.md`); there is no input-fidelity difference.
+- The baseline is a **single qwen3.5:397b call — the same model the
+  board uses as Chief** — so any delta between the two outputs is
+  attributable to the workflow (multi-persona rounds + gates), not to
+  a stronger model.
+- Run #2 was executed **supervised** (human decision at all 7 gates);
+  run #1 was executed **unattended**.
