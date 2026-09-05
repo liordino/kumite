@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AgentNode, PipelinePlan } from '$lib/api';
+	import { api, type AgentNode, type PipelinePlan, type RepoAgent } from '$lib/api';
 
 	let {
 		plan,
@@ -18,6 +18,42 @@
 	let working: PipelinePlan = $state(structuredClone(plan));
 	let dirty = $derived(JSON.stringify(working) !== JSON.stringify(plan));
 	let error = $state('');
+	let repoAgents = $state<RepoAgent[] | null>(null);
+	let repoError = $state('');
+	let showRepo = $state(false);
+
+	async function toggleRepo() {
+		showRepo = !showRepo;
+		if (showRepo && repoAgents === null) {
+			try {
+				repoAgents = await api.repoListing();
+			} catch (e) {
+				repoError = String(e);
+			}
+		}
+	}
+
+	function addRepoAgent(a: RepoAgent, wave: 1 | 2) {
+		const node: AgentNode = {
+			id: a.agent_id,
+			agent_id: a.agent_id,
+			display_name: a.display_name,
+			role_summary: '',
+			source_url: a.source_url,
+			wave,
+			status: 'pending',
+			enabled: true,
+			rationale: 'Added from the full repo.'
+		};
+		if (wave === 1) working.pipeline.wave1.push(node);
+		else working.pipeline.wave2.push(node);
+		working = { ...working };
+	}
+
+	const repoAvailable = $derived(
+		(repoAgents ?? []).filter((a) => !allIds.has(a.agent_id))
+	);
+	const allIds = $derived(new Set(working.pipeline.wave1.concat(working.pipeline.wave2).map((n) => n.agent_id)));
 
 	const fourBlock = $derived([
 		{ label: 'What is wanted', value: working.context.four_block.what_is_wanted },
@@ -150,6 +186,37 @@
 			</ul>
 		</div>
 	{/each}
+
+	<div class="border-b border-zinc-200 px-4 py-3">
+		<button
+			type="button"
+			class="text-xs font-medium text-zinc-500 underline hover:text-zinc-900"
+			onclick={toggleRepo}
+		>
+			{showRepo ? 'Hide' : 'Add from'} the full repo (advanced)
+		</button>
+		{#if showRepo}
+			{#if repoError}
+				<p class="mt-2 text-sm text-red-800">{repoError}</p>
+			{:else if repoAgents === null}
+				<p class="mt-2 text-sm text-zinc-500">Loading repo…</p>
+			{:else if repoAvailable.length === 0}
+				<p class="mt-2 text-sm text-zinc-500">Every repo agent is already in the panel.</p>
+			{:else}
+				<ul class="mt-2 max-h-64 space-y-1 overflow-auto">
+					{#each repoAvailable as a (a.agent_id)}
+						<li class="flex items-center justify-between gap-2 rounded border border-zinc-200 px-2 py-1">
+							<span class="text-sm text-zinc-800">{a.display_name}</span>
+							<span class="flex gap-1 text-xs">
+								<button type="button" class="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100" onclick={() => addRepoAgent(a, 1)}>→ W1</button>
+								<button type="button" class="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100" onclick={() => addRepoAgent(a, 2)}>→ W2</button>
+							</span>
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		{/if}
+	</div>
 
 	<div class="px-4 py-3">
 		<h3 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">

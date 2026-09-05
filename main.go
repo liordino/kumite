@@ -56,6 +56,11 @@ func main() {
 		log.Fatalf("parse roster: %v", err)
 	}
 
+	var repoTreeURL string
+	if treeURL, ok := engine.RepoTreeURL(cfg.GitHubRawBase); ok {
+		repoTreeURL = treeURL
+	}
+
 	var override *engine.RuntimeLLMConfig
 	if cfg.LLMMock {
 		mock := tests.NewMockLLM()
@@ -67,12 +72,14 @@ func main() {
 	}
 
 	server := &handlers.Server{
-		DB:          database,
-		LLM:         engine.NewClient(),
-		HTTP:        &http.Client{Timeout: 30 * time.Second},
-		CacheTTL:    time.Duration(cfg.AgentCacheTTLHours) * time.Hour,
-		Roster:      roster,
-		LLMOverride: override,
+		DB:            database,
+		LLM:           engine.NewClient(),
+		HTTP:          &http.Client{Timeout: 30 * time.Second},
+		CacheTTL:      time.Duration(cfg.AgentCacheTTLHours) * time.Hour,
+		GitHubRawBase: cfg.GitHubRawBase,
+		GitHubTreeURL: repoTreeURL,
+		Roster:        roster,
+		LLMOverride:   override,
 	}
 
 	addr := fmt.Sprintf(":%d", cfg.Port)

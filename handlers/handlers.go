@@ -20,6 +20,12 @@ type Server struct {
 	HTTP     *http.Client // used for GitHub fetches
 	CacheTTL time.Duration
 	Roster   []models.RosterEntry // curated roster, embedded at build time
+	// GitHubRawBase enables the advanced full-repo roster (GET
+	// /api/agents/repo) and repo-sourced plan nodes; empty disables it.
+	GitHubRawBase string
+	// GitHubTreeURL is the tree-API endpoint listing the repo's agents;
+	// derived from GitHubRawBase in main, set directly in tests.
+	GitHubTreeURL string
 
 	// hub tracks in-flight runs and their SSE subscribers; lazily created.
 	hub *runHub
@@ -46,6 +52,7 @@ func (s *Server) Routes() http.Handler {
 
 	r.Route("/api/agents", func(r chi.Router) {
 		r.Get("/roster", s.roster)
+		r.Get("/repo", s.repoListing)
 		r.Route("/custom", func(r chi.Router) {
 			r.Get("/", s.listCustomAgents)
 			r.Post("/", s.createCustomAgent)

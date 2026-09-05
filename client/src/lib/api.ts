@@ -130,6 +130,12 @@ export interface RosterEntry {
 	fixed: boolean;
 }
 
+export interface RepoAgent {
+	agent_id: string;
+	display_name: string;
+	source_url: string;
+}
+
 export interface CustomAgent {
 	id: string;
 	display_name: string;
@@ -217,6 +223,9 @@ export const api = {
 	// Agents
 	roster(): Promise<RosterEntry[]> {
 		return request('GET', '/api/agents/roster');
+	},
+	repoListing(): Promise<RepoAgent[]> {
+		return request('GET', '/api/agents/repo');
 	},
 	listCustomAgents(): Promise<CustomAgent[]> {
 		return request('GET', '/api/agents/custom');

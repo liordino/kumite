@@ -218,6 +218,11 @@ func (s *Server) updatePlan(w http.ResponseWriter, r *http.Request) {
 		if customIDs[node.AgentID] {
 			return node, true
 		}
+		// Advanced full-repo roster: a node carrying a source URL under the
+		// configured raw base is accepted as-is (noted API.md addition).
+		if s.isRepoSource(node.SourceURL) {
+			return node, true
+		}
 		return models.AgentNode{}, false
 	}
 

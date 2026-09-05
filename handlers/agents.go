@@ -193,3 +193,29 @@ func slugify(name string) string {
 	}
 	return slug
 }
+
+// repoListing implements GET /api/agents/repo — the advanced full-repo
+// roster. NOT part of the original API.md; added for the advanced mode the
+// brief mandates ("a curated default roster of 13 agents, with an advanced
+// mode exposing the full repo").
+func (s *Server) repoListing(w http.ResponseWriter, r *http.Request) {
+	if s.GitHubTreeURL == "" || s.GitHubRawBase == "" {
+		writeErr(w, http.StatusNotImplemented, "advanced roster disabled: GITHUB_RAW_BASE not configured")
+		return
+	}
+	listing, err := engine.FetchRepoListing(r.Context(), s.DB, s.HTTP, s.GitHubTreeURL, s.GitHubRawBase, s.CacheTTL)
+	if err != nil {
+		mapLLMErr(w, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, listing)
+}
+
+// isRepoSource accepts an agent node whose source_url points at the
+// configured GitHub raw base — the advanced-roster path. NOT part of the
+// original API.md validation contract; noted addition (see commit).
+func (s *Server) isRepoSource(sourceURL string) bool {
+	return s.GitHubRawBase != "" &&
+		strings.HasPrefix(sourceURL, strings.TrimRight(s.GitHubRawBase, "/")+"/") &&
+		strings.HasSuffix(sourceURL, ".md")
+}

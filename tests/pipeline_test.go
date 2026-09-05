@@ -18,7 +18,7 @@ import (
 
 // newPipelineServer returns the db handle, the mock provider (for route
 // registration) and the HTTP server under test.
-func newPipelineServer(t *testing.T, ttl time.Duration) (*db.DB, *MockLLM, *httptest.Server) {
+func newPipelineServer(t *testing.T, ttl time.Duration, configure ...func(*handlers.Server)) (*db.DB, *MockLLM, *httptest.Server) {
 	t.Helper()
 	d, err := db.OpenInMemory()
 	if err != nil {
@@ -47,6 +47,9 @@ func newPipelineServer(t *testing.T, ttl time.Duration) (*db.DB, *MockLLM, *http
 		CacheTTL:    ttl,
 		Roster:      roster,
 		LLMOverride: &engine.RuntimeLLMConfig{Endpoint: mock.Server.URL, Model: "mock-model"},
+	}
+	for _, c := range configure {
+		c(srv)
 	}
 	ts := httptest.NewServer(srv.Routes())
 	t.Cleanup(ts.Close)
@@ -426,5 +429,81 @@ func TestStreamAttachNoRun(t *testing.T) {
 	}
 	if resp, _, _ := doJSON(t, "GET", ts.URL+"/api/pipeline/stream/no-such-session", nil); resp.StatusCode != http.StatusNotFound {
 		t.Fatalf("attach unknown session status = %d, want 404", resp.StatusCode)
+	}
+}
+
+// TestRepoListingHTTP: the advanced full-repo roster lists the repo's agent
+// prompt files (README excluded), cached under the TTL.
+func TestRepoListingHTTP(t *testing.T) {
+	gh := githubFixtureServer(t)
+	_, _, ts := newPipelineServer(t, time.Hour, func(s *handlers.Server) {
+		s.GitHubRawBase = gh.URL
+		s.GitHubTreeURL = gh.URL + "/tree"
+	})
+
+	resp, _, raw := doJSON(t, "GET", ts.URL+"/api/agents/repo", nil)
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("repo listing status = %d: %s", resp.StatusCode, string(raw))
+	}
+	var agents []engine.RepoAgent
+	if err := json.Unmarshal(raw, &agents); err != nil {
+		t.Fatalf("decode listing: %v", err)
+	}
+	if len(agents) != 2 {
+		t.Fatalf("entries = %d, want 2 (README excluded)", len(agents))
+	}
+	if agents[0].AgentID != "engineering-software-architect" ||
+		agents[0].SourceURL != gh.URL+"/engineering/engineering-software-architect.md" {
+		t.Fatalf("entry = %+v", agents[0])
+	}
+}
+
+// TestUpdatePlanRepoAgent: a plan node sourced from the full repo is
+// accepted by server-side validation (noted API.md addition) and persists
+// with its source_url, so the runner can fetch it.
+func TestUpdatePlanRepoAgent(t *testing.T) {
+	gh := githubFixtureServer(t)
+	d, mock, ts := newPipelineServer(t, time.Hour, func(s *handlers.Server) {
+		s.GitHubRawBase = gh.URL
+		s.GitHubTreeURL = gh.URL + "/tree"
+	})
+	registerPipelineRoutes(mock, loadFixture(t, "phase0_plan.json"), loadFixture(t, "agent_output.json"), loadFixture(t, "psd.md"))
+
+	id := createSessionForRun(t, ts)
+	plan := runPhase0(t, ts, id)
+
+	modified := *plan
+	repoNode := models.AgentNode{
+		ID:          "game-game-designer",
+		AgentID:     "game-game-designer",
+		DisplayName: "Game Designer",
+		SourceURL:   gh.URL + "/game-development/game-designer.md",
+		Wave:        models.Wave1,
+		Status:      models.StatusPending,
+		Enabled:     true,
+		Rationale:   "Added from the full repo.",
+	}
+	modified.Pipeline.Wave1 = append(append([]models.AgentNode(nil), plan.Pipeline.Wave1...), repoNode)
+
+	resp, _, _ := doJSON(t, "PATCH", ts.URL+"/api/pipeline/"+id+"/plan", modified)
+	if resp.StatusCode != http.StatusOK {
+		t.Fatalf("repo-sourced patch status = %d", resp.StatusCode)
+	}
+
+	sess, err := d.GetSession(id)
+	if err != nil {
+		t.Fatalf("get session: %v", err)
+	}
+	found := false
+	for _, node := range sess.PipelinePlan.Pipeline.Wave1 {
+		if node.AgentID == "game-game-designer" {
+			found = true
+			if node.SourceURL != gh.URL+"/game-development/game-designer.md" {
+				t.Fatalf("source_url not persisted: %q", node.SourceURL)
+			}
+		}
+	}
+	if !found {
+		t.Fatal("repo agent missing from persisted plan")
 	}
 }

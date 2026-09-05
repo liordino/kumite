@@ -23,6 +23,14 @@ func githubFixtureServer(t *testing.T) *httptest.Server {
 	t.Helper()
 	etag := ""
 	mux := http.NewServeMux()
+	mux.HandleFunc("/tree", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"tree":[
+			{"path":"engineering/engineering-software-architect.md","type":"blob"},
+			{"path":"design/design-ux-researcher.md","type":"blob"},
+			{"path":"README.md","type":"blob"}
+		]}`)
+	})
 	mux.HandleFunc("/arch.md", func(w http.ResponseWriter, r *http.Request) {
 		if etag != "" && r.Header.Get("If-None-Match") == etag {
 			w.WriteHeader(http.StatusNotModified)
