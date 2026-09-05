@@ -1,0 +1,123 @@
+[
+  {
+    "agent_id": "engineering-software-architect",
+    "display_name": "Software Architect",
+    "division": "engineering",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/engineering/engineering-software-architect.md",
+    "default_wave": 1,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "engineering-security-engineer",
+    "display_name": "Security Engineer",
+    "division": "engineering",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/engineering/engineering-security-engineer.md",
+    "default_wave": 2,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "engineering-data-engineer",
+    "display_name": "Data Engineer",
+    "division": "engineering",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/engineering/engineering-data-engineer.md",
+    "default_wave": 1,
+    "conditional": true,
+    "condition": "project_type:software,saas,hybrid",
+    "fixed": false
+  },
+  {
+    "agent_id": "design-ux-researcher",
+    "display_name": "UX Researcher",
+    "division": "design",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/design/design-ux-researcher.md",
+    "default_wave": 1,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "product-trend-researcher",
+    "display_name": "Trend Researcher",
+    "division": "product",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/product/product-trend-researcher.md",
+    "default_wave": 1,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "product-manager",
+    "display_name": "Product Manager",
+    "division": "product",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/product/product-manager.md",
+    "default_wave": 1,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "project-manager-senior",
+    "display_name": "Senior Project Manager",
+    "division": "project-management",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/project-management/project-manager-senior.md",
+    "default_wave": 2,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "support-legal-compliance-checker",
+    "display_name": "Legal Compliance Checker",
+    "division": "support",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/support/support-legal-compliance-checker.md",
+    "default_wave": 2,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "testing-tool-evaluator",
+    "display_name": "Tool Evaluator",
+    "division": "testing",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/testing/testing-tool-evaluator.md",
+    "default_wave": 2,
+    "conditional": true,
+    "condition": "has_tooling_decisions",
+    "fixed": false
+  },
+  {
+    "agent_id": "finance-financial-analyst",
+    "display_name": "Financial Analyst",
+    "division": "finance",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/finance/finance-financial-analyst.md",
+    "default_wave": 1,
+    "conditional": false,
+    "fixed": false
+  },
+  {
+    "agent_id": "game-designer",
+    "display_name": "Game Designer",
+    "division": "game-development",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/game-development/game-designer.md",
+    "default_wave": 1,
+    "conditional": true,
+    "condition": "project_type:game,hybrid",
+    "fixed": false
+  },
+  {
+    "agent_id": "narrative-designer",
+    "display_name": "Narrative Designer",
+    "division": "game-development",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/game-development/narrative-designer.md",
+    "default_wave": 1,
+    "conditional": true,
+    "condition": "project_type:game,hybrid+has_narrative",
+    "fixed": false
+  },
+  {
+    "agent_id": "testing-reality-checker",
+    "display_name": "Reality Checker",
+    "division": "testing",
+    "source_url": "https://raw.githubusercontent.com/msitarzewski/agency-agents/main/testing/testing-reality-checker.md",
+    "default_wave": 3,
+    "conditional": false,
+    "fixed": true
+  }
+]

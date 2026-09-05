@@ -1,0 +1,44 @@
+# Go build artifacts
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# SQLite databases (kumite.db lives on disk, never in git)
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Local environment
+.env
+
+# Impeccable engine binaries — regenerable platform-specific artifacts,
+# re-downloaded by the skill launcher on demand (npx impeccable install).
+.claude/skills/impeccable/scripts/bin/
+.cursor/skills/impeccable/scripts/bin/
+.pi/skills/impeccable/scripts/bin/
+
+# Impeccable runtime state (critique snapshots, live session journals).
+# .impeccable/config.json, when it exists, stays tracked.
+.impeccable/critique/
+.impeccable/live/
+
+# Node / SvelteKit
+node_modules/
+.svelte-kit/
+build/
+dist/
+.vite/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
