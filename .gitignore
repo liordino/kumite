@@ -42,3 +42,7 @@ npm-debug.log*
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Local overnight runner logs
+agent_errors.log
+.agent_tmp_err.log
