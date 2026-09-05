@@ -55,6 +55,12 @@ func (s *Server) Routes() http.Handler {
 		r.Get("/{agentId}", s.getAgentPrompt)
 	})
 
+	r.Route("/api/intake", func(r chi.Router) {
+		r.Get("/explain", s.intakeExplain)
+		r.Post("/{id}", s.runIntake)
+		r.Delete("/{id}", s.revertIntake)
+	})
+
 	r.Route("/api/pipeline", func(r chi.Router) {
 		r.Post("/phase0/{id}", s.phase0)
 		r.Patch("/{id}/plan", s.updatePlan)

@@ -257,6 +257,21 @@ func (d *DB) SetRawSource(id, raw string) error {
 	return nil
 }
 
+// ClearRawSource resets raw_source to NULL — the revert path. NULL is the
+// record of a skipped or undone distillation; it must never degrade to an
+// empty string.
+func (d *DB) ClearRawSource(id string) error {
+	res, err := d.Exec(`UPDATE sessions SET raw_source = NULL, updated_at = ? WHERE id = ?`, NowUTC(), id)
+	if err != nil {
+		return fmt.Errorf("clear raw source: %w", err)
+	}
+	n, _ := res.RowsAffected()
+	if n == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
 // SetSessionPhase writes the phase and touches updated_at. Called before
 // every LLM call so state is recoverable.
 func (d *DB) SetSessionPhase(id string, phase models.SessionPhase) error {
