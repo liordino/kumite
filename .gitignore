@@ -46,3 +46,5 @@ Thumbs.db
 # Local overnight runner logs
 agent_errors.log
 .agent_tmp_err.log
+# Runner completion sentinel (written by the agent, consumed by run_agent.ps1)
+.agent_done
