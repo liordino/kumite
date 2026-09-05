@@ -3,16 +3,16 @@
 // (same-origin in production; Vite dev proxy in development).
 
 export type SessionPhase =
-	| 'intake'
-	| 'distilling'
-	| 'pipeline_review'
-	| 'running'
-	| 'synthesis'
-	| 'interrupted'
-	| 'complete'
-	| 'error';
+	| "intake"
+	| "distilling"
+	| "pipeline_review"
+	| "running"
+	| "synthesis"
+	| "interrupted"
+	| "complete"
+	| "error";
 
-export type AgentStatus = 'pending' | 'running' | 'done' | 'skipped' | 'error';
+export type AgentStatus = "pending" | "running" | "done" | "skipped" | "error";
 
 export type Wave = 1 | 2 | 3;
 
@@ -29,8 +29,8 @@ export interface AgentNode {
 }
 
 export interface Finding {
-	type: 'opportunity' | 'risk' | 'question' | 'constraint';
-	severity: 'low' | 'medium' | 'high' | 'critical';
+	type: "opportunity" | "risk" | "question" | "constraint";
+	severity: "low" | "medium" | "high" | "critical";
 	title: string;
 	body: string;
 }
@@ -52,7 +52,7 @@ export interface AgentOutput {
 	agent_id: string;
 	display_name: string;
 	wave: number;
-	status: 'done' | 'partial' | 'error';
+	status: "done" | "partial" | "error";
 	output: AgentOutputData;
 	thinking: string;
 	error?: string;
@@ -151,11 +151,16 @@ export interface IntakeExplanation {
 	skip: { label: string; when: string; why: string; cost: string };
 }
 
-async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+async function request<T>(
+	method: string,
+	path: string,
+	body?: unknown,
+): Promise<T> {
 	const res = await fetch(path, {
 		method,
-		headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
-		body: body === undefined ? undefined : JSON.stringify(body)
+		headers:
+			body === undefined ? undefined : { "Content-Type": "application/json" },
+		body: body === undefined ? undefined : JSON.stringify(body),
 	});
 	const text = await res.text();
 	let parsed: unknown = null;
@@ -168,7 +173,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 	}
 	if (!res.ok) {
 		const msg =
-			parsed && typeof parsed === 'object' && 'error' in parsed
+			parsed && typeof parsed === "object" && "error" in parsed
 				? String((parsed as { error: unknown }).error)
 				: `${res.status} ${res.statusText}`;
 		throw new Error(msg);
@@ -179,76 +184,81 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 export const api = {
 	// Sessions
 	listSessions(filters?: Record<string, string>): Promise<SessionListItem[]> {
-		const q = filters ? '?' + new URLSearchParams(filters).toString() : '';
-		return request('GET', '/api/sessions' + q);
+		const q = filters ? "?" + new URLSearchParams(filters).toString() : "";
+		return request("GET", "/api/sessions" + q);
 	},
 	getSession(id: string): Promise<Session> {
-		return request('GET', `/api/sessions/${id}`);
+		return request("GET", `/api/sessions/${id}`);
 	},
-	createSession(project_name: string, raw_input: string): Promise<{ id: string }> {
-		return request('POST', '/api/sessions', { project_name, raw_input });
+	createSession(
+		project_name: string,
+		raw_input: string,
+	): Promise<{ id: string }> {
+		return request("POST", "/api/sessions", { project_name, raw_input });
 	},
 	patchSession(id: string, patch: Partial<Session>): Promise<{ ok: boolean }> {
-		return request('PATCH', `/api/sessions/${id}`, patch);
+		return request("PATCH", `/api/sessions/${id}`, patch);
 	},
 	deleteSession(id: string): Promise<{ ok: boolean }> {
-		return request('DELETE', `/api/sessions/${id}`);
+		return request("DELETE", `/api/sessions/${id}`);
 	},
 
 	// Intake
 	intakeExplain(): Promise<IntakeExplanation> {
-		return request('GET', '/api/intake/explain');
+		return request("GET", "/api/intake/explain");
 	},
 	runIntake(id: string): Promise<{ raw_input: string; raw_source: string }> {
-		return request('POST', `/api/intake/${id}`);
+		return request("POST", `/api/intake/${id}`);
 	},
 	revertIntake(id: string): Promise<{ ok: boolean }> {
-		return request('DELETE', `/api/intake/${id}`);
+		return request("DELETE", `/api/intake/${id}`);
 	},
 
 	// Pipeline
 	phase0(id: string): Promise<{ pipeline_plan: PipelinePlan }> {
-		return request('POST', `/api/pipeline/phase0/${id}`);
+		return request("POST", `/api/pipeline/phase0/${id}`);
 	},
 	updatePlan(id: string, plan: PipelinePlan): Promise<{ ok: boolean }> {
-		return request('PATCH', `/api/pipeline/${id}/plan`, plan);
+		return request("PATCH", `/api/pipeline/${id}/plan`, plan);
 	},
 	run(id: string): Promise<Response> {
-		return fetch(`/api/pipeline/run/${id}`, { method: 'POST' });
+		return fetch(`/api/pipeline/run/${id}`, { method: "POST" });
 	},
 	resume(id: string): Promise<Response> {
-		return fetch(`/api/pipeline/resume/${id}`, { method: 'POST' });
+		return fetch(`/api/pipeline/resume/${id}`, { method: "POST" });
 	},
 
 	// Agents
 	roster(): Promise<RosterEntry[]> {
-		return request('GET', '/api/agents/roster');
+		return request("GET", "/api/agents/roster");
 	},
 	repoListing(): Promise<RepoAgent[]> {
-		return request('GET', '/api/agents/repo');
+		return request("GET", "/api/agents/repo");
 	},
 	listCustomAgents(): Promise<CustomAgent[]> {
-		return request('GET', '/api/agents/custom');
+		return request("GET", "/api/agents/custom");
 	},
-	createCustomAgent(a: Omit<CustomAgent, 'id' | 'created_at' | 'updated_at'>): Promise<{ id: string }> {
-		return request('POST', '/api/agents/custom', a);
+	createCustomAgent(
+		a: Omit<CustomAgent, "id" | "created_at" | "updated_at">,
+	): Promise<{ id: string }> {
+		return request("POST", "/api/agents/custom", a);
 	},
 	deleteCustomAgent(id: string): Promise<{ ok: boolean }> {
-		return request('DELETE', `/api/agents/custom/${id}`);
+		return request("DELETE", `/api/agents/custom/${id}`);
 	},
 
 	// Handoff
 	handoff(sessionId: string): Promise<{ brief_md: string; context_md: string }> {
-		return request('POST', `/api/handoff/${sessionId}`);
+		return request("POST", `/api/handoff/${sessionId}`);
 	},
 
 	// Config
 	getConfig(): Promise<Record<string, string>> {
-		return request('GET', '/api/config');
+		return request("GET", "/api/config");
 	},
 	putConfig(values: Record<string, string>): Promise<{ ok: boolean }> {
-		return request('PUT', '/api/config', values);
-	}
+		return request("PUT", "/api/config", values);
+	},
 };
 
 // SSE event parsed from a run/resume stream.
@@ -261,11 +271,11 @@ export interface RunEvent {
 // is a text/event-stream; parse it line by line until the server closes.
 export async function streamRun(
 	promise: Promise<Response>,
-	onEvent: (ev: RunEvent) => void
+	onEvent: (ev: RunEvent) => void,
 ): Promise<void> {
 	const res = await promise;
 	if (!res.ok || !res.body) {
-		const text = await res.text().catch(() => '');
+		const text = await res.text().catch(() => "");
 		let msg = `${res.status} ${res.statusText}`;
 		try {
 			const parsed = JSON.parse(text) as { error?: string };
@@ -277,20 +287,20 @@ export async function streamRun(
 	}
 	const reader = res.body.getReader();
 	const decoder = new TextDecoder();
-	let buf = '';
+	let buf = "";
 	for (;;) {
 		const { done, value } = await reader.read();
 		if (done) break;
 		buf += decoder.decode(value, { stream: true });
 		let idx: number;
-		while ((idx = buf.indexOf('\n\n')) >= 0) {
+		while ((idx = buf.indexOf("\n\n")) >= 0) {
 			const block = buf.slice(0, idx);
 			buf = buf.slice(idx + 2);
-			let event = 'message';
-			let data = '';
-			for (const line of block.split('\n')) {
-				if (line.startsWith('event: ')) event = line.slice(7).trim();
-				else if (line.startsWith('data: ')) data += line.slice(6);
+			let event = "message";
+			let data = "";
+			for (const line of block.split("\n")) {
+				if (line.startsWith("event: ")) event = line.slice(7).trim();
+				else if (line.startsWith("data: ")) data += line.slice(6);
 			}
 			let parsed: Record<string, unknown> = {};
 			try {

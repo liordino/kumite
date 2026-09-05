@@ -2,7 +2,7 @@
 // watched. No session state lives here: everything durable comes from the
 // API and reloads from it.
 
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
 /** Session id of the run currently being watched, when any. */
 export const watchingRun = writable<string | null>(null);
