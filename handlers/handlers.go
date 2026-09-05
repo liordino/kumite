@@ -69,6 +69,8 @@ func (s *Server) Routes() http.Handler {
 		r.Get("/stream/{id}", s.stream)
 	})
 
+	r.Post("/api/handoff/{sessionId}", s.handoff)
+
 	r.Route("/api/config", func(r chi.Router) {
 		r.Get("/", s.getConfig)
 		r.Put("/", s.putConfig)

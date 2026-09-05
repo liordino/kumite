@@ -228,6 +228,11 @@ export const api = {
 		return request('DELETE', `/api/agents/custom/${id}`);
 	},
 
+	// Handoff
+	handoff(sessionId: string): Promise<{ brief_md: string; context_md: string }> {
+		return request('POST', `/api/handoff/${sessionId}`);
+	},
+
 	// Config
 	getConfig(): Promise<Record<string, string>> {
 		return request('GET', '/api/config');

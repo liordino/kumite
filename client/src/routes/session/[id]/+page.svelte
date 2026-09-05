@@ -19,6 +19,8 @@
 	let liveThinking = $state<Record<string, string>>({});
 	let livePsd = $state('');
 	let streaming = $state(false);
+	let handoffBundle = $state<{ brief_md: string; context_md: string } | null>(null);
+	let handoffBusy = $state(false);
 
 	let attachSource: EventSource | null = null;
 
@@ -80,6 +82,19 @@
 				runError = String(d.error);
 				void reload();
 				break;
+		}
+	}
+
+	async function generateHandoff() {
+		if (!session) return;
+		handoffBusy = true;
+		runError = '';
+		try {
+			handoffBundle = await api.handoff(session.id);
+		} catch (e) {
+			runError = String(e);
+		} finally {
+			handoffBusy = false;
 		}
 	}
 
@@ -257,6 +272,37 @@
 		{:else if session.phase === 'complete'}
 			{#if session.psd}
 				<PsdPanel psd={session.psd} />
+				<section class="rounded border border-zinc-300 bg-white px-4 py-3">
+					<div class="flex flex-wrap items-center justify-between gap-3">
+						<div>
+							<h2 class="text-sm font-semibold text-zinc-900">Dojo handoff bundle</h2>
+							<p class="mt-1 text-sm text-zinc-600">
+								Reframe the verdict as a Dojo feasibility brief plus a CONTEXT.md seed —
+								ready for Dojo&apos;s /hajime.
+							</p>
+						</div>
+						<button
+							type="button"
+							class="rounded border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-100 disabled:opacity-50"
+							disabled={handoffBusy}
+							onclick={generateHandoff}
+						>
+							{handoffBusy ? 'Generating…' : 'Generate bundle'}
+						</button>
+					</div>
+					{#if handoffBundle}
+						<div class="mt-3 space-y-3">
+							<div>
+								<p class="mb-1 text-xs font-medium tracking-wide text-zinc-500 uppercase">BRIEF.md</p>
+								<pre class="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-700">{handoffBundle.brief_md}</pre>
+							</div>
+							<div>
+								<p class="mb-1 text-xs font-medium tracking-wide text-zinc-500 uppercase">CONTEXT.md seed</p>
+								<pre class="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-zinc-50 p-3 text-xs leading-relaxed text-zinc-700">{handoffBundle.context_md}</pre>
+							</div>
+						</div>
+					{/if}
+				</section>
 			{/if}
 			<section class="space-y-3">
 				<h2 class="text-sm font-semibold text-zinc-900">Specialist outputs</h2>
