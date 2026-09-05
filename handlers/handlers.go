@@ -21,6 +21,9 @@ type Server struct {
 	CacheTTL time.Duration
 	Roster   []models.RosterEntry // curated roster, embedded at build time
 
+	// hub tracks in-flight runs and their SSE subscribers; lazily created.
+	hub *runHub
+
 	// LLMOverride, when set (LLM_MOCK=true), replaces the app_config-derived
 	// provider settings so dev runs never touch a real provider.
 	LLMOverride *engine.RuntimeLLMConfig
@@ -50,6 +53,14 @@ func (s *Server) Routes() http.Handler {
 			r.Delete("/{id}", s.deleteCustomAgent)
 		})
 		r.Get("/{agentId}", s.getAgentPrompt)
+	})
+
+	r.Route("/api/pipeline", func(r chi.Router) {
+		r.Post("/phase0/{id}", s.phase0)
+		r.Patch("/{id}/plan", s.updatePlan)
+		r.Post("/run/{id}", s.run)
+		r.Post("/resume/{id}", s.resume)
+		r.Get("/stream/{id}", s.stream)
 	})
 
 	r.Route("/api/config", func(r chi.Router) {
