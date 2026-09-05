@@ -1,0 +1,22 @@
+{
+  "project_name": "Field Ledger",
+  "domain": "tool",
+  "tags": ["offline-first", "data-entry", "local-storage"],
+  "classification_notes": "A single-user field data entry tool with local storage and CSV export. Runs on the author's own devices.",
+  "diagnostic": {
+    "what_is_wanted": "present",
+    "how_it_should_be_done": "partial",
+    "what_is_not_wanted": "missing",
+    "how_success_is_measured": "partial"
+  },
+  "flags": [
+    { "severity": "high", "title": "No exclusions stated", "body": "The input never says what this is NOT. Unstated don't-wants become bugs." },
+    { "severity": "medium", "title": "Vague term: fast", "body": "'Fast sync' is used without a concrete definition." }
+  ],
+  "agents": [
+    { "id": "engineering-software-architect", "display_name": "Software Architect", "wave": 1, "enabled": true, "rationale": "Local-first storage shape drives every other decision." },
+    { "id": "design-ux-researcher", "display_name": "UX Researcher", "wave": 1, "enabled": true, "rationale": "Field data entry on a phone under poor conditions is a UX problem." },
+    { "id": "project-manager-senior", "display_name": "Senior Project Manager", "wave": 2, "enabled": true, "rationale": "Solo-developer scope risk needs explicit sequencing." },
+    { "id": "testing-reality-checker", "display_name": "Reality Checker", "wave": 3, "enabled": true, "rationale": "Fixed final challenger." }
+  ]
+}
