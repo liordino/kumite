@@ -20,7 +20,7 @@
 	// via {#key session.pipeline_plan} whenever the persisted plan changes,
 	// so capturing the prop's initial value is the contract.
 	// svelte-ignore state_referenced_locally
-	let working: PipelinePlan = $state(structuredClone(plan));
+	let working: PipelinePlan = $state($state.snapshot(plan));
 	let dirty = $derived(JSON.stringify(working) !== JSON.stringify(plan));
 	let error = $state('');
 	let repoAgents = $state<RepoAgent[] | null>(null);
