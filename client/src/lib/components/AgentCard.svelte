@@ -38,11 +38,11 @@
 		</p>
 	</div>
 
-	{#if output.output.findings.length > 0}
+	{#if (output.output.findings ?? []).length > 0}
 		<div class="border-t border-zinc-200 px-4 py-3">
 			<h4 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Findings</h4>
 			<ul class="mt-2 space-y-2">
-				{#each output.output.findings as f (f.title)}
+				{#each output.output.findings ?? [] as f (f.title)}
 					<li class="border {severityClass[f.severity] ?? severityClass.low} rounded px-3 py-2">
 						<p class="text-sm font-medium">
 							<span class="font-semibold uppercase">{f.severity}</span>
@@ -56,11 +56,11 @@
 		</div>
 	{/if}
 
-	{#if output.output.open_questions.length > 0}
+	{#if (output.output.open_questions ?? []).length > 0}
 		<div class="border-t border-zinc-200 px-4 py-3">
 			<h4 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Open questions</h4>
 			<ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-zinc-700">
-				{#each output.output.open_questions as q}
+				{#each output.output.open_questions ?? [] as q}
 					<li>{q}</li>
 				{/each}
 			</ul>
