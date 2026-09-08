@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	_ "net/http/pprof" // registers /debug/pprof on the diagnostic listener
+	"runtime"
 	"time"
 
 	"kumite/config"
@@ -82,8 +84,22 @@ func main() {
 		LLMOverride:   override,
 	}
 
+	// Diagnostic-only listener (NOT part of the API surface): pprof goroutine
+	// and CPU profiles on 127.0.0.1, for post-morteming wedges like the one
+	// that would otherwise be undebuggable. Never exposed beyond localhost.
+	diag := http.NewServeMux()
+	diag.HandleFunc("/debug/pprof/", func(w http.ResponseWriter, r *http.Request) {
+		http.DefaultServeMux.ServeHTTP(w, r)
+	})
+	go func() {
+		log.Printf("diagnostics on http://127.0.0.1:3002/debug/pprof/")
+		if err := http.ListenAndServe("127.0.0.1:3002", diag); err != nil {
+			log.Printf("diagnostics listener: %v", err)
+		}
+	}()
+
 	addr := fmt.Sprintf(":%d", cfg.Port)
-	log.Printf("kumite listening on %s (db: %s)", addr, cfg.DBPath)
+	log.Printf("kumite listening on %s (db: %s, goroutines: %d)", addr, cfg.DBPath, runtime.NumGoroutine())
 	if err := http.ListenAndServe(addr, server.Routes()); err != nil {
 		log.Fatalf("serve: %v", err)
 	}
