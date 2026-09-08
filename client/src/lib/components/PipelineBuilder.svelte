@@ -15,6 +15,11 @@
 
 	// Local editable copy — nothing is sent until Save. No pipeline logic
 	// lives here: ordering validation is server-side (PATCH /plan).
+	//
+	// The init-capture is intentional: the parent remounts this component
+	// via {#key session.pipeline_plan} whenever the persisted plan changes,
+	// so capturing the prop's initial value is the contract.
+	// svelte-ignore state_referenced_locally
 	let working: PipelinePlan = $state(structuredClone(plan));
 	let dirty = $derived(JSON.stringify(working) !== JSON.stringify(plan));
 	let error = $state('');
@@ -50,10 +55,10 @@
 		working = { ...working };
 	}
 
+	const allIds = $derived(new Set(working.pipeline.wave1.concat(working.pipeline.wave2).map((n) => n.agent_id)));
 	const repoAvailable = $derived(
 		(repoAgents ?? []).filter((a) => !allIds.has(a.agent_id))
 	);
-	const allIds = $derived(new Set(working.pipeline.wave1.concat(working.pipeline.wave2).map((n) => n.agent_id)));
 
 	const fourBlock = $derived([
 		{ label: 'What is wanted', value: working.context.four_block.what_is_wanted },
