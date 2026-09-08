@@ -164,11 +164,12 @@ async function request<T>(
 	});
 	const text = await res.text();
 	let parsed: unknown = null;
+	let parseFailed = false;
 	if (text) {
 		try {
 			parsed = JSON.parse(text);
 		} catch {
-			// non-JSON body — fall through with the status error
+			parseFailed = true; // non-JSON body
 		}
 	}
 	if (!res.ok) {
@@ -177,6 +178,14 @@ async function request<T>(
 				? String((parsed as { error: unknown }).error)
 				: `${res.status} ${res.statusText}`;
 		throw new Error(msg);
+	}
+	if (parseFailed || parsed === null) {
+		// A 2xx with a non-JSON body (e.g. the SPA fallback served when the
+		// dev proxy is not forwarding to the backend) must fail LOUDLY —
+		// returning null here silently stalls every caller at its loading state.
+		throw new Error(
+			`non-JSON response from ${path} — is the /api proxy forwarding to the backend? body: ${text.slice(0, 120)}`,
+		);
 	}
 	return parsed as T;
 }
