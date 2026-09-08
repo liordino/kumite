@@ -358,6 +358,20 @@ func (d *DB) AppendAgentOutput(sessionID string, out models.AgentOutput, nodeID 
 	}
 	outputs = append(outputs, out)
 
+	// Contract: every persisted AgentOutputData carries arrays, never null —
+	// errored and partial outputs included. Normalized at this single choke
+	// point so no path can store nulls the client would crash on.
+	if out.Output.Findings == nil {
+		out.Output.Findings = []models.Finding{}
+	}
+	if out.Output.OpenQuestions == nil {
+		out.Output.OpenQuestions = []string{}
+	}
+	if out.Output.PsdContributions == nil {
+		out.Output.PsdContributions = []models.PsdContribution{}
+	}
+	outputs[len(outputs)-1] = out
+
 	planJSON, err := json.Marshal(&plan)
 	if err != nil {
 		return fmt.Errorf("append agent output marshal plan: %w", err)

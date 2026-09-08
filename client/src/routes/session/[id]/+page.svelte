@@ -1,5 +1,12 @@
 <script lang="ts">
-	import { api, streamRun, type AgentNode, type RunEvent, type Session } from '$lib/api';
+	import {
+		api,
+		streamRun,
+		type AgentNode,
+		type RunEvent,
+		type Session,
+		type SessionPhase
+	} from '$lib/api';
 	import { expandedThinking, toggleThinking } from '$lib/stores';
 	import AgentCard from '$lib/components/AgentCard.svelte';
 	import IntakeChoice from '$lib/components/IntakeChoice.svelte';
@@ -18,13 +25,34 @@
 	let liveNodes = $state<AgentNode[]>([]);
 	let liveThinking = $state<Record<string, string>>({});
 	let livePsd = $state('');
-	let streaming = $state(false);
+	// The client-side phase during a triggered run: the persisted session
+	// phase only updates on completion, so the monitor branch keys off this.
+	let livePhase = $state<SessionPhase | ''>('');
 	let handoffBundle = $state<{ brief_md: string; context_md: string } | null>(null);
 	let handoffBusy = $state(false);
 
 	let attachSource: EventSource | null = null;
 
-	const phase = $derived(session?.phase ?? null);
+	// Display phase: a triggered run drives this live (the persisted session
+	// phase only updates on completion, via reload).
+	const phase = $derived<SessionPhase>(livePhase || (session?.phase ?? 'intake'));
+
+	const nowRunning = $derived(liveNodes.find((n) => n.status === 'running') ?? null);
+
+	const waveGroups = $derived([
+		{
+			title: 'Wave 1 — independent analysis',
+			nodes: liveNodes.filter((n) => n.wave === 1)
+		},
+		{
+			title: 'Wave 2 — reactive analysis',
+			nodes: liveNodes.filter((n) => n.wave === 2)
+		},
+		{
+			title: 'Fixed — Reality Checker',
+			nodes: liveNodes.filter((n) => n.wave === 3)
+		}
+	]);
 
 	$effect(() => {
 		const id = params.id;
@@ -44,7 +72,6 @@
 		const d = ev.data;
 		switch (ev.event) {
 			case 'pipeline_start':
-				streaming = true;
 				break;
 			case 'agent_start':
 				liveNodes = liveNodes.map((n) =>
@@ -67,6 +94,9 @@
 					n.agent_id === d.agent_id ? { ...n, status: 'error' as const } : n
 				);
 				break;
+			case 'synthesis_start':
+				livePhase = 'synthesis';
+				break;
 			case 'psd_chunk':
 				livePsd += String(d.chunk);
 				break;
@@ -74,12 +104,12 @@
 				livePsd = String(d.psd);
 				break;
 			case 'pipeline_complete':
-				streaming = false;
+				livePhase = '';
 				void reload();
 				break;
 			case 'pipeline_error':
-				streaming = false;
 				runError = String(d.error);
+				livePhase = '';
 				void reload();
 				break;
 		}
@@ -125,13 +155,13 @@
 		liveNodes = allNodes(session);
 		livePsd = '';
 		liveThinking = {};
+		livePhase = 'running';
 		try {
 			await streamRun(resume ? api.resume(session.id) : api.run(session.id), handleRunEvent);
 		} catch (e) {
 			runError = String(e);
 		} finally {
 			busy = false;
-			streaming = false;
 			await reload();
 		}
 	}
@@ -140,6 +170,7 @@
 	// are not replayed — the session above is the record.
 	$effect(() => {
 		if ((phase === 'running' || phase === 'synthesis') && !attachSource && session) {
+			livePhase = session.phase;
 			liveNodes = allNodes(session);
 			const es = new EventSource(`/api/pipeline/stream/${session.id}`);
 			const close = () => es.close();
@@ -186,6 +217,34 @@
 </script>
 
 <div class="mx-auto max-w-4xl space-y-6">
+	{#snippet statusIcon(status: AgentNode['status'])}
+		{#if status === 'running'}
+			<span class="inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900"></span>
+		{:else if status === 'done'}
+			<span class="shrink-0 text-sm font-medium text-green-700">✓</span>
+		{:else if status === 'error'}
+			<span class="shrink-0 text-sm font-medium text-red-700">✗</span>
+		{:else if status === 'skipped'}
+			<span class="shrink-0 text-sm text-zinc-400">—</span>
+		{:else}
+			<span class="inline-block h-2.5 w-2.5 shrink-0 rounded-full border-2 border-zinc-300"></span>
+		{/if}
+	{/snippet}
+
+	{#snippet statusText(status: AgentNode['status'])}
+		{#if status === 'running'}
+			<span class="text-zinc-900">analyzing…</span>
+		{:else if status === 'done'}
+			<span class="text-zinc-500">done</span>
+		{:else if status === 'error'}
+			<span class="text-red-800">failed — the run continued</span>
+		{:else if status === 'skipped'}
+			<span class="text-zinc-400">skipped</span>
+		{:else}
+			<span class="text-zinc-400">pending</span>
+		{/if}
+	{/snippet}
+
 	<p class="text-xs text-zinc-500">
 		<a class="underline hover:text-zinc-900" href="/">← All sessions</a>
 	</p>
@@ -198,9 +257,15 @@
 		<header class="rounded border border-zinc-300 bg-white px-4 py-3">
 			<div class="flex flex-wrap items-baseline justify-between gap-2">
 				<h1 class="text-lg font-semibold text-zinc-900">{session.project_name}</h1>
-				<span class="text-xs text-zinc-500">{session.phase}</span>
+				<span class="text-xs text-zinc-500">{phase}</span>
 			</div>
-			<p class="mt-1 text-sm text-zinc-600">{phaseText[session.phase]}</p>
+			<p class="mt-1 text-sm text-zinc-600">{phaseText[phase]}</p>
+			{#if nowRunning}
+				<p class="mt-2 flex items-center gap-2 text-sm text-zinc-700">
+					<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900"></span>
+					Now analyzing: {nowRunning.display_name}
+				</p>
+			{/if}
 			{#if runError}
 				<p class="mt-2 rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800">
 					{runError}
@@ -218,24 +283,35 @@
 			{/if}
 		</header>
 
-		{#if session.phase === 'intake'}
+		{#if phase === 'intake'}
 			<IntakeChoice
 				sessionId={session.id}
 				rawInput={session.raw_input}
 				rawSource={session.raw_source}
 				onChanged={() => reload()}
 			/>
-			<section class="flex justify-end">
+			<section class="flex flex-wrap items-center justify-end gap-3">
+				{#if busy}
+					<p class="mr-auto flex items-center gap-2 text-sm text-zinc-600">
+						<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900"></span>
+						Shishō is classifying the input and proposing the panel — a real model call, this can take a minute.
+					</p>
+				{/if}
 				<button
 					type="button"
-					class="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+					class="flex items-center gap-2 rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
 					disabled={busy}
 					onclick={runPhase0}
 				>
-					Run Phase 0 — classify and propose panel
+					{#if busy}
+						<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-500 border-t-transparent"></span>
+						Classifying…
+					{:else}
+						Run Phase 0 — classify and propose panel
+					{/if}
 				</button>
 			</section>
-		{:else if session.phase === 'pipeline_review' && session.pipeline_plan}
+		{:else if phase === 'pipeline_review' && session.pipeline_plan}
 			{#key session.pipeline_plan}
 				<PipelineBuilder
 					plan={session.pipeline_plan}
@@ -244,32 +320,50 @@
 					onStart={() => startRun(false)}
 				/>
 			{/key}
-		{:else if (session.phase === 'running' || session.phase === 'synthesis') && session.pipeline_plan}
-			<section class="space-y-3">
-				<h2 class="text-sm font-semibold text-zinc-900">Panel execution</h2>
-				{#each liveNodes as node (node.id)}
-					<div class="rounded border border-zinc-300 bg-white px-4 py-2">
-						<div class="flex items-center justify-between">
-							<span class="text-sm font-medium text-zinc-900">{node.display_name}</span>
-							<span class="text-xs text-zinc-500">
-								{node.status === 'running' ? 'running…' : node.status}
-							</span>
-						</div>
-						{#if node.status === 'running' && liveThinking[node.agent_id]}
-							<ThinkingTrace
-								agentId={node.agent_id}
-								thinking={liveThinking[node.agent_id]}
-								expanded={$expandedThinking.has(node.agent_id)}
-								onToggle={toggleThinking}
-							/>
+		{:else if (phase === 'running' || phase === 'synthesis') && session.pipeline_plan}
+			<section class="space-y-4">
+				{#each waveGroups as wave (wave.title)}
+					<div class="rounded border border-zinc-300 bg-white">
+						<h3 class="border-b border-zinc-200 px-4 py-2 text-xs font-medium tracking-wide text-zinc-500 uppercase">{wave.title}</h3>
+						{#if wave.nodes.length === 0}
+							<p class="px-4 py-3 text-sm text-zinc-500">No agents in this wave.</p>
+						{:else}
+							<ul class="divide-y divide-zinc-100">
+								{#each wave.nodes as node (node.id)}
+									<li class="flex items-center gap-3 px-4 py-2">
+										{@render statusIcon(node.status)}
+										<span class="flex-1 text-sm {node.status === 'running' ? 'font-medium text-zinc-900' : 'text-zinc-700'}">{node.display_name}</span>
+										{@render statusText(node.status)}
+									</li>
+									{#if node.status === 'running' && liveThinking[node.agent_id]}
+										<li class="px-4 pb-2 pl-10">
+											<ThinkingTrace
+												agentId={node.agent_id}
+												thinking={liveThinking[node.agent_id]}
+												expanded={$expandedThinking.has(node.agent_id)}
+												onToggle={toggleThinking}
+											/>
+										</li>
+									{/if}
+								{/each}
+							</ul>
 						{/if}
 					</div>
 				{/each}
-				{#if livePsd}
-					<PsdPanel psd={livePsd} />
+
+				{#if phase === 'synthesis'}
+					<div class="rounded border border-zinc-300 bg-white px-4 py-3">
+						<p class="flex items-center gap-2 text-sm text-zinc-700">
+							<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-900"></span>
+							Shishō is synthesizing the Project Summary Document…
+						</p>
+					</div>
+					{#if livePsd}
+						<PsdPanel psd={livePsd} />
+					{/if}
 				{/if}
 			</section>
-		{:else if session.phase === 'complete'}
+		{:else if phase === 'complete'}
 			{#if session.psd}
 				<PsdPanel psd={session.psd} />
 				<section class="rounded border border-zinc-300 bg-white px-4 py-3">
@@ -283,10 +377,13 @@
 						</div>
 						<button
 							type="button"
-							class="rounded border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-100 disabled:opacity-50"
+							class="flex items-center gap-2 rounded border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-100 disabled:opacity-50"
 							disabled={handoffBusy}
 							onclick={generateHandoff}
 						>
+							{#if handoffBusy}
+								<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-500 border-t-transparent"></span>
+							{/if}
 							{handoffBusy ? 'Generating…' : 'Generate bundle'}
 						</button>
 					</div>
@@ -314,7 +411,7 @@
 					/>
 				{/each}
 			</section>
-		{:else if session.phase === 'interrupted' && session.pipeline_plan}
+		{:else if phase === 'interrupted' && session.pipeline_plan}
 			<section class="space-y-3">
 				<h2 class="text-sm font-semibold text-zinc-900">Preserved results</h2>
 				{#each session.agent_outputs as output (output.agent_id)}

@@ -168,7 +168,10 @@ func runAgent(ctx context.Context, deps RunDeps, template string, sessionID stri
 			Wave:        int(node.Wave),
 			Status:      "error",
 			Error:       err.Error(),
-			Output:      models.AgentOutputData{Findings: []models.Finding{}},
+			Output: models.AgentOutputData{
+				Findings:      []models.Finding{},
+				OpenQuestions: []string{},
+			},
 		}
 		if appendErr := deps.DB.AppendAgentOutput(sessionID, errored, node.ID, models.StatusError); appendErr != nil {
 			return fmt.Errorf("persist agent error %s: %w (original: %v)", node.AgentID, appendErr, err)
