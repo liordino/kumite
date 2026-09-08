@@ -233,6 +233,11 @@ func (s *Server) updatePlan(w http.ResponseWriter, r *http.Request) {
 		InputType:   plan.InputType,
 		ProjectType: plan.ProjectType,
 		Context:     plan.Context,
+		Pipeline: models.PipelineWaves{
+			Wave1: []models.AgentNode{},
+			Wave2: []models.AgentNode{},
+			Fixed: []models.AgentNode{},
+		},
 	}
 
 	for i := range plan.Pipeline.Wave1 {

@@ -19,8 +19,16 @@
 	// The init-capture is intentional: the parent remounts this component
 	// via {#key session.pipeline_plan} whenever the persisted plan changes,
 	// so capturing the prop's initial value is the contract.
-	// svelte-ignore state_referenced_locally
-	let working: PipelinePlan = $state($state.snapshot(plan));
+	// Defensive: wave arrays are always arrays in the stored plan contract —
+	// but rows written before that contract held null. Normalize the plain
+	// snapshot BEFORE wrapping it in state, so the template never reads
+	// .length on null.
+	const snapshot = $state.snapshot(plan);
+	snapshot.pipeline.wave1 ??= [];
+	snapshot.pipeline.wave2 ??= [];
+	snapshot.pipeline.fixed ??= [];
+	snapshot.context.flags ??= [];
+	let working: PipelinePlan = $state(snapshot);
 	let dirty = $derived(JSON.stringify(working) !== JSON.stringify(plan));
 	let error = $state('');
 	let repoAgents = $state<RepoAgent[] | null>(null);

@@ -230,6 +230,14 @@ func mapPhase0(session models.Session, out Phase0Output, roster []models.RosterE
 		InputType:   inputTypeFor(session, out),
 		ProjectType: models.ProjectType(out.Domain),
 	}
+	// Wave arrays are always arrays in the stored plan — never null. A plan
+	// with zero agents in a wave (a real model may select none) must
+	// marshal as [], not null, or every client reading it crashes.
+	plan.Pipeline = models.PipelineWaves{
+		Wave1: []models.AgentNode{},
+		Wave2: []models.AgentNode{},
+		Fixed: []models.AgentNode{},
+	}
 
 	seen := map[string]bool{}
 	var rc *models.AgentNode
