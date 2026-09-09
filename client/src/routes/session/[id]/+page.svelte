@@ -20,6 +20,7 @@
 	let loadError = $state('');
 	let busy = $state(false);
 	let runError = $state('');
+	let pauseNotice = $state('');
 
 	// Live-run view state (a run outlives the client; this is only the tail).
 	let liveNodes = $state<AgentNode[]>([]);
@@ -103,6 +104,11 @@
 			case 'psd_done':
 				livePsd = String(d.psd);
 				break;
+			case 'run_paused':
+				livePhase = '';
+				pauseNotice = 'Run paused — ' + String(d.agent_id) + ' failed: ' + String(d.error) + '. Resume to retry it.';
+				void reload();
+				break;
 			case 'pipeline_complete':
 				livePhase = '';
 				void reload();
@@ -152,6 +158,7 @@
 		if (!session) return;
 		busy = true;
 		runError = '';
+		pauseNotice = '';
 		liveNodes = allNodes(session);
 		livePsd = '';
 		liveThinking = {};
@@ -274,6 +281,11 @@
 			{#if runError}
 				<p class="mt-2 rounded border border-red-900 bg-red-950/50 px-3 py-2 text-sm text-red-300">
 					{runError}
+				</p>
+			{/if}
+			{#if pauseNotice}
+				<p class="mt-2 rounded border border-amber-900/50 bg-amber-950/30 px-3 py-2 text-sm text-amber-300">
+					{pauseNotice}
 				</p>
 			{/if}
 			{#if phase === 'interrupted'}
