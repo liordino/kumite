@@ -32,10 +32,10 @@
 	}
 </script>
 
-<div class="overflow-x-auto rounded border border-zinc-300 bg-white">
+<div class="overflow-x-auto rounded border border-zinc-800 bg-zinc-900">
 	<table class="w-full text-sm">
 		<thead>
-			<tr class="border-b border-zinc-300 bg-zinc-50 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
+			<tr class="border-b border-zinc-800 bg-zinc-900/50 text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
 				<th class="px-4 py-2">Project</th>
 				<th class="px-4 py-2">Phase</th>
 				<th class="px-4 py-2">Domain</th>
@@ -46,22 +46,22 @@
 		</thead>
 		<tbody>
 			{#each sessions as s (s.id)}
-				<tr class="border-b border-zinc-200 last:border-b-0 hover:bg-zinc-50">
+				<tr class="border-b border-zinc-800 last:border-b-0 hover:bg-zinc-900/50">
 					<td class="px-4 py-2">
-						<a class="font-medium text-zinc-900 underline decoration-zinc-300 hover:decoration-zinc-900" href="/session/{s.id}">
+						<a class="font-medium text-zinc-100 underline decoration-zinc-300 hover:decoration-zinc-100" href="/session/{s.id}">
 							{s.project_name}
 						</a>
 						{#if s.distilled}<span class="ml-2 text-xs text-zinc-500">distilled</span>{/if}
 					</td>
-					<td class="px-4 py-2 text-zinc-600">{phaseLabel[s.phase] ?? s.phase}</td>
-					<td class="px-4 py-2 text-zinc-600">{s.domain || '—'}</td>
-					<td class="px-4 py-2 text-zinc-600">{severityText(s.finding_summary)}</td>
+					<td class="px-4 py-2 text-zinc-400">{phaseLabel[s.phase] ?? s.phase}</td>
+					<td class="px-4 py-2 text-zinc-400">{s.domain || '—'}</td>
+					<td class="px-4 py-2 text-zinc-400">{severityText(s.finding_summary)}</td>
 					<td class="px-4 py-2 text-zinc-500">{new Date(s.updated_at).toLocaleString()}</td>
 					<td class="px-4 py-2 text-right">
 						{#if confirmId === s.id}
 							<button
 								type="button"
-								class="rounded border border-red-300 bg-red-50 px-2 py-1 text-xs font-medium text-red-800 hover:bg-red-100"
+								class="rounded border border-red-300 bg-red-50 px-2 py-1 text-xs font-medium text-red-400 hover:bg-red-100"
 								onclick={() => {
 									onDelete(s.id);
 									confirmId = null;
@@ -79,7 +79,7 @@
 						{:else}
 							<button
 								type="button"
-								class="text-xs text-zinc-500 underline hover:text-zinc-900"
+								class="text-xs text-zinc-500 underline hover:text-zinc-100"
 								onclick={() => (confirmId = s.id)}
 							>
 								delete

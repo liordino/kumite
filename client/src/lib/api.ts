@@ -231,18 +231,12 @@ export const api = {
 	updatePlan(id: string, plan: PipelinePlan): Promise<{ ok: boolean }> {
 		return request("PATCH", `/api/pipeline/${id}/plan`, plan);
 	},
-	run(
-		id: string,
-		opts?: { pause_on_fail?: boolean }
-	): Promise<Response> {
+	run(id: string, opts?: { pause_on_fail?: boolean }): Promise<Response> {
 		return fetch(`/api/pipeline/run/${id}`, {
 			method: "POST",
 			headers:
-				opts === undefined
-					? undefined
-					: { "Content-Type": "application/json" },
-			body:
-				opts === undefined ? undefined : JSON.stringify(opts)
+				opts === undefined ? undefined : { "Content-Type": "application/json" },
+			body: opts === undefined ? undefined : JSON.stringify(opts),
 		});
 	},
 	resume(id: string): Promise<Response> {

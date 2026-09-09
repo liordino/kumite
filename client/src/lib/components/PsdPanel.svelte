@@ -1,71 +1,125 @@
 <script lang="ts">
-	// Renders the PSD markdown without a markdown dependency and without any
-	// innerHTML: line-classified plain text, styled by line kind. Sections are
-	// always shown in their fixed order; empty sections show their placeholder
-	// exactly as Shishō wrote it.
-	let { psd }: { psd: string } = $props();
+	import {
+		parsePsd,
+		parseBlocks,
+		parseInline,
+		downloadMarkdown,
+		type MdBlock,
+		type MdInline
+	} from '$lib/markdown';
 
-	type Line = { kind: 'frontmatter' | 'h1' | 'h2' | 'item' | 'text' | 'blank'; text: string };
+	let { psd, projectName }: { psd: string; projectName?: string } = $props();
 
-	const lines: Line[] = $derived.by(() => {
-		const out: Line[] = [];
-		let inFrontmatter = false;
-		let frontmatterDone = false;
-		for (const raw of psd.split('\n')) {
-			const line = raw.trimEnd();
-			if (!frontmatterDone) {
-				if (line === '---') {
-					if (!inFrontmatter) {
-						inFrontmatter = true;
-						out.push({ kind: 'blank', text: '' });
-						continue;
-					}
-					frontmatterDone = true;
-					out.push({ kind: 'blank', text: '' });
-					continue;
-				}
-				if (inFrontmatter) {
-					out.push({ kind: 'frontmatter', text: line });
-					continue;
-				}
-			}
-			if (line === '---') {
-				out.push({ kind: 'blank', text: '' });
-				continue;
-			}
-			if (line.startsWith('# ')) out.push({ kind: 'h1', text: line.slice(2) });
-			else if (line.startsWith('## ')) out.push({ kind: 'h2', text: line.slice(3) });
-			else if (line.startsWith('- ')) out.push({ kind: 'item', text: line.slice(2) });
-			else if (line === '') out.push({ kind: 'blank', text: '' });
-			else out.push({ kind: 'text', text: line });
-		}
-		return out;
-	});
+	const parsed = $derived(parsePsd(psd));
+
+	const renderedSections = $derived(
+		parsed.sections.map((s) => ({ title: s.title, blocks: parseBlocks(s.body) }))
+	);
+
+	function download() {
+		const name = (parsed.title || projectName || 'psd')
+			.replace(/[^a-z0-9]+/gi, '-')
+			.toLowerCase();
+		downloadMarkdown(`${name}.md`, psd);
+	}
 </script>
 
-<article class="rounded border border-zinc-300 bg-white">
-	<header class="border-b border-zinc-300 px-6 py-4">
-		<h2 class="text-sm font-semibold tracking-wide text-zinc-500 uppercase">Project Summary Document</h2>
-	</header>
-	<div class="px-6 py-5">
-		{#each lines as line, i (i)}
-			{#if line.kind === 'h1'}
-				<h3 class="mt-6 mb-2 text-lg font-semibold text-zinc-900 first:mt-0">{line.text}</h3>
-			{:else if line.kind === 'h2'}
-				<h4 class="mt-6 mb-2 border-b border-zinc-200 pb-1 text-sm font-semibold tracking-wide text-zinc-900 uppercase">
-					{line.text}
-				</h4>
-			{:else if line.kind === 'item'}
-				<p class="border-l-2 border-zinc-300 py-0.5 pl-3 text-sm leading-relaxed text-zinc-800">
-					{line.text}
-				</p>
-			{:else if line.kind === 'frontmatter'}
-				<p class="font-mono text-xs text-zinc-500">{line.text}</p>
-			{:else if line.kind === 'text'}
-				<p class="my-2 text-sm leading-relaxed text-zinc-800">{line.text}</p>
-			{:else}
-				<div class="h-2"></div>
+{#snippet renderInlines(inlines: MdInline[])}
+	{#each inlines as seg}
+		{#if seg.kind === 'strong'}
+			<strong class="font-semibold text-zinc-100">{seg.text}</strong>
+		{:else if seg.kind === 'em'}
+			<em class="italic text-zinc-200">{seg.text}</em>
+		{:else if seg.kind === 'code'}
+			<code class="rounded bg-zinc-800 px-1 py-0.5 text-[0.85em] text-zinc-200">{seg.text}</code>
+		{:else}
+			{seg.text}
+		{/if}
+	{/each}
+{/snippet}
+
+{#snippet renderBlocks(blocks: MdBlock[])}
+	{#each blocks as block}
+		{#if block.kind === 'heading'}
+			<h4 class="mt-4 mb-1 text-sm font-semibold tracking-wide text-zinc-100">
+				{@render renderInlines(block.inlines)}
+			</h4>
+		{:else if block.kind === 'paragraph'}
+			<p class="my-2 text-sm leading-relaxed text-zinc-300">
+				{@render renderInlines(block.inlines)}
+			</p>
+		{:else if block.kind === 'list'}
+			<ul class="my-2 list-disc space-y-1 pl-5">
+				{#each block.items as itemInlines}
+					<li class="text-sm leading-relaxed text-zinc-300">
+						{@render renderInlines(itemInlines)}
+					</li>
+				{/each}
+			</ul>
+		{:else if block.kind === 'blank'}
+			<div class="h-1"></div>
+		{/if}
+	{/each}
+{/snippet}
+
+<article class="overflow-hidden rounded border border-zinc-800 bg-zinc-900">
+	<header class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-6 py-4">
+		<div>
+			<p class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Project Summary Document</p>
+			{#if parsed.title}
+				<h2 class="mt-0.5 text-base font-semibold text-zinc-100">{parsed.title}</h2>
 			{/if}
-		{/each}
-	</div>
+		</div>
+		<button
+			type="button"
+			class="rounded border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:bg-zinc-800 hover:text-zinc-100"
+			onclick={() => download()}
+		>
+			Download .md
+		</button>
+	</header>
+
+	{#if parsed.frontmatter}
+		<details class="border-b border-zinc-800">
+			<summary class="cursor-pointer px-6 py-2 text-xs text-zinc-500 hover:text-zinc-300">
+				frontmatter
+			</summary>
+			<pre class="overflow-auto px-6 pb-3 text-xs leading-relaxed text-zinc-500">{parsed.frontmatter}</pre>
+		</details>
+	{/if}
+
+	{#each renderedSections as section, i (section.title)}
+		<details class="border-b border-zinc-800 last:border-b-0" open={i < 2}>
+			<summary class="cursor-pointer px-6 py-3 text-sm font-semibold text-zinc-200 select-none hover:text-zinc-100">
+				{section.title}
+			</summary>
+			<div class="px-6 pb-5">
+				{#if section.blocks.length === 0}
+					<p class="text-sm text-zinc-500 italic">_No panel contribution for this section._</p>
+				{:else}
+					{#each section.blocks as block}
+						{#if block.kind === 'heading'}
+							<h4 class="mt-4 mb-1 text-sm font-semibold tracking-wide text-zinc-100">
+								{@render renderInlines(block.inlines)}
+							</h4>
+						{:else if block.kind === 'paragraph'}
+							<p class="my-2 text-sm leading-relaxed text-zinc-300">
+								{@render renderInlines(block.inlines)}
+							</p>
+						{:else if block.kind === 'list'}
+							<ul class="my-2 list-disc space-y-1 pl-5">
+								{#each block.items as itemInlines}
+									<li class="text-sm leading-relaxed text-zinc-300">
+										{@render renderInlines(itemInlines)}
+									</li>
+								{/each}
+							</ul>
+						{:else if block.kind === 'blank'}
+							<div class="h-1"></div>
+						{/if}
+					{/each}
+				{/if}
+			</div>
+		</details>
+	{/each}
 </article>

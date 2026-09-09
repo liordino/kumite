@@ -7,13 +7,13 @@
 
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
-<div class="min-h-screen bg-zinc-100 text-zinc-900">
-	<header class="border-b border-zinc-300 bg-white">
+<div class="min-h-screen bg-zinc-900 text-zinc-100">
+	<header class="border-b border-zinc-800 bg-zinc-900">
 		<div class="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-			<a class="text-sm font-semibold tracking-wide text-zinc-900" href="/">KUMITE</a>
+			<a class="text-sm font-semibold tracking-wide text-zinc-100" href="/">KUMITE</a>
 			<nav class="flex items-center gap-4 text-sm">
-				<a class="text-zinc-600 hover:text-zinc-900" href="/">Sessions</a>
-				<a class="text-zinc-600 hover:text-zinc-900" href="/settings">Settings</a>
+				<a class="text-zinc-400 hover:text-zinc-100" href="/">Sessions</a>
+				<a class="text-zinc-400 hover:text-zinc-100" href="/settings">Settings</a>
 			</nav>
 		</div>
 	</header>

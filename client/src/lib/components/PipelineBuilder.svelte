@@ -114,10 +114,10 @@
 	}
 </script>
 
-<section class="rounded border border-zinc-300 bg-white">
-	<header class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-300 px-4 py-3">
+<section class="rounded border border-zinc-800 bg-zinc-900">
+	<header class="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-3">
 		<div>
-			<h2 class="text-sm font-semibold text-zinc-900">Proposed panel</h2>
+			<h2 class="text-sm font-semibold text-zinc-100">Proposed panel</h2>
 			<p class="mt-0.5 text-xs text-zinc-500">
 				{working.project_name} · {working.context.domain} · input: {working.input_type} ·
 				maturity: {working.context.maturity}
@@ -127,7 +127,7 @@
 		<div class="flex items-center gap-3">
 			<button
 				type="button"
-				class="rounded border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-800 hover:bg-zinc-100 disabled:opacity-50"
+				class="rounded border border-zinc-700 px-3 py-1.5 text-sm font-medium text-zinc-200 hover:bg-zinc-900 disabled:opacity-50"
 				disabled={!dirty || busy}
 				onclick={save}
 			>
@@ -144,7 +144,7 @@
 			</label>
 			<button
 				type="button"
-				class="rounded bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
+				class="rounded bg-zinc-900 px-3 py-1.5 text-sm font-medium text-zinc-950 hover:bg-zinc-300 disabled:opacity-50"
 				disabled={busy}
 				onclick={run}
 			>
@@ -154,7 +154,7 @@
 	</header>
 
 	{#if error}
-		<p class="border-b border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800">{error}</p>
+		<p class="border-b border-red-200 bg-red-50 px-4 py-2 text-sm text-red-400">{error}</p>
 	{/if}
 	{#if dirty}
 		<p class="border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">
@@ -162,49 +162,49 @@
 		</p>
 	{/if}
 
-	<div class="border-b border-zinc-200 px-4 py-3">
+	<div class="border-b border-zinc-800 px-4 py-3">
 		<h3 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Classification</h3>
-		<p class="mt-1 text-sm text-zinc-700">{working.context.problem_statement}</p>
+		<p class="mt-1 text-sm text-zinc-300">{working.context.problem_statement}</p>
 		<dl class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
 			{#each fourBlock as block (block.label)}
-				<div class="rounded border border-zinc-200 px-2 py-1.5">
+				<div class="rounded border border-zinc-800 px-2 py-1.5">
 					<dt class="text-xs text-zinc-500">{block.label}</dt>
-					<dd class="text-sm font-medium text-zinc-800">{block.value}</dd>
+					<dd class="text-sm font-medium text-zinc-200">{block.value}</dd>
 				</div>
 			{/each}
 		</dl>
 		{#if working.context.flags.length > 0}
 			<ul class="mt-3 space-y-1">
 				{#each working.context.flags as flag (flag)}
-					<li class="border-l-2 border-amber-400 pl-2 text-sm text-zinc-700">{flag}</li>
+					<li class="border-l-2 border-amber-400 pl-2 text-sm text-zinc-300">{flag}</li>
 				{/each}
 			</ul>
 		{/if}
 	</div>
 
 	{#each [{ title: 'Wave 1 — independent analysis', nodes: working.pipeline.wave1, other: working.pipeline.wave2 }, { title: 'Wave 2 — reactive analysis', nodes: working.pipeline.wave2, other: working.pipeline.wave1 }] as wave (wave.title)}
-		<div class="border-b border-zinc-200 px-4 py-3">
+		<div class="border-b border-zinc-800 px-4 py-3">
 			<h3 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">{wave.title}</h3>
 			{#if wave.nodes.length === 0}
 				<p class="mt-2 text-sm text-zinc-500">No agents in this wave.</p>
 			{/if}
 			<ul class="mt-2 space-y-2">
 				{#each wave.nodes as node, i (node.id)}
-					<li class="flex items-start justify-between gap-3 rounded border border-zinc-200 px-3 py-2">
+					<li class="flex items-start justify-between gap-3 rounded border border-zinc-800 px-3 py-2">
 						<label class="flex items-start gap-2">
 							<input type="checkbox" class="mt-1" checked={node.enabled} onchange={() => toggle(node)} />
 							<span>
-								<span class="block text-sm font-medium text-zinc-900">{node.display_name}</span>
+								<span class="block text-sm font-medium text-zinc-100">{node.display_name}</span>
 								<span class="block text-xs text-zinc-500">{node.rationale}</span>
 							</span>
 						</label>
 						<span class="flex shrink-0 items-center gap-1 text-xs">
 							{#if i > 0}
-								<button type="button" class="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100" disabled={busy} onclick={() => moveUp(node, wave.nodes, i)}>↑</button>
+								<button type="button" class="rounded border border-zinc-800 px-1.5 py-0.5 hover:bg-zinc-900" disabled={busy} onclick={() => moveUp(node, wave.nodes, i)}>↑</button>
 							{/if}
 							<button
 								type="button"
-								class="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100"
+								class="rounded border border-zinc-800 px-1.5 py-0.5 hover:bg-zinc-900"
 								disabled={busy}
 								onclick={() => moveBetween(node, wave.nodes, wave.other)}
 							>
@@ -217,17 +217,17 @@
 		</div>
 	{/each}
 
-	<div class="border-b border-zinc-200 px-4 py-3">
+	<div class="border-b border-zinc-800 px-4 py-3">
 		<button
 			type="button"
-			class="text-xs font-medium text-zinc-500 underline hover:text-zinc-900"
+			class="text-xs font-medium text-zinc-500 underline hover:text-zinc-100"
 			onclick={toggleRepo}
 		>
 			{showRepo ? 'Hide' : 'Add from'} the full repo (advanced)
 		</button>
 		{#if showRepo}
 			{#if repoError}
-				<p class="mt-2 text-sm text-red-800">{repoError}</p>
+				<p class="mt-2 text-sm text-red-400">{repoError}</p>
 			{:else if repoAgents === null}
 				<p class="mt-2 text-sm text-zinc-500">Loading repo…</p>
 			{:else if repoAvailable.length === 0}
@@ -235,11 +235,11 @@
 			{:else}
 				<ul class="mt-2 max-h-64 space-y-1 overflow-auto">
 					{#each repoAvailable as a (a.agent_id)}
-						<li class="flex items-center justify-between gap-2 rounded border border-zinc-200 px-2 py-1">
-							<span class="text-sm text-zinc-800">{a.display_name}</span>
+						<li class="flex items-center justify-between gap-2 rounded border border-zinc-800 px-2 py-1">
+							<span class="text-sm text-zinc-200">{a.display_name}</span>
 							<span class="flex gap-1 text-xs">
-								<button type="button" class="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100" onclick={() => addRepoAgent(a, 1)}>→ W1</button>
-								<button type="button" class="rounded border border-zinc-300 px-1.5 py-0.5 hover:bg-zinc-100" onclick={() => addRepoAgent(a, 2)}>→ W2</button>
+								<button type="button" class="rounded border border-zinc-800 px-1.5 py-0.5 hover:bg-zinc-900" onclick={() => addRepoAgent(a, 1)}>→ W1</button>
+								<button type="button" class="rounded border border-zinc-800 px-1.5 py-0.5 hover:bg-zinc-900" onclick={() => addRepoAgent(a, 2)}>→ W2</button>
 							</span>
 						</li>
 					{/each}
@@ -254,9 +254,9 @@
 		</h3>
 		<ul class="mt-2 space-y-2">
 			{#each working.pipeline.fixed as node (node.id)}
-				<li class="flex items-start justify-between gap-3 rounded border border-zinc-300 bg-zinc-50 px-3 py-2">
+				<li class="flex items-start justify-between gap-3 rounded border border-zinc-800 bg-zinc-900/50 px-3 py-2">
 					<span>
-						<span class="block text-sm font-medium text-zinc-900">{node.display_name}</span>
+						<span class="block text-sm font-medium text-zinc-100">{node.display_name}</span>
 						<span class="block text-xs text-zinc-500">{node.rationale}</span>
 					</span>
 					<span class="shrink-0 text-xs text-zinc-500">always last</span>
