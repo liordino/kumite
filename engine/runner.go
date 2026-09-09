@@ -2,6 +2,7 @@ package engine
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -45,6 +46,18 @@ func (deps RunDeps) llmConfig() (RuntimeLLMConfig, error) {
 // is agnostic to the transport — handlers own the stream.
 type EmitFunc func(event string, payload any)
 
+// ErrRunPaused is returned when the pause-on-specialist-fail policy stopped
+// the run after a specialist failed. The session transitions to interrupted;
+// resume re-runs the failed specialist. A clean policy stop — not a failure.
+type ErrRunPaused struct {
+	AgentID string
+	Cause   error
+}
+
+func (e *ErrRunPaused) Error() string {
+	return fmt.Sprintf("run paused: specialist %s failed: %v", e.AgentID, e.Cause)
+}
+
 // RunPipeline walks the persisted plan in wave order, skipping nodes already
 // done or skipped, executing the rest. It is used by both the run and the
 // resume endpoints; resume is driven purely by node status. On entry the
@@ -60,6 +73,7 @@ func RunPipeline(ctx context.Context, deps RunDeps, session models.Session, emit
 	}
 
 	plan := session.PipelinePlan
+	pauseOnFail := plan.PauseOnFail
 	emit("pipeline_start", map[string]any{
 		"session_id":   session.ID,
 		"total_agents": RemainingAgents(plan),
@@ -97,7 +111,21 @@ func RunPipeline(ctx context.Context, deps RunDeps, session models.Session, emit
 				continue // resume: driven by node status, no stored cursor
 			}
 
-			if err := runAgent(ctx, deps, template, session.ID, node, emit); err != nil {
+			if err := runAgent(ctx, deps, template, session.ID, node, pauseOnFail, emit); err != nil {
+				var paused *ErrRunPaused
+				if errors.As(err, &paused) {
+					// Policy pause: the run stops RESUMABLY — the failed
+					// specialist retries on resume. Interrupted, not error.
+					if phaseErr := deps.DB.SetSessionPhase(session.ID, models.PhaseInterrupted); phaseErr != nil {
+						return fmt.Errorf("run pipeline %s: %w (original: %v)", session.ID, phaseErr, err)
+					}
+					emit("run_paused", map[string]any{
+						"session_id": session.ID,
+						"agent_id":   paused.AgentID,
+						"error":      paused.Cause.Error(),
+					})
+					return nil
+				}
 				return fmt.Errorf("run pipeline %s: %w", session.ID, err)
 			}
 		}
@@ -147,7 +175,7 @@ func RunPipeline(ctx context.Context, deps RunDeps, session models.Session, emit
 // call), fetch + assemble the prompt, stream the call, persist the result
 // together with its node status in the same transaction. Specialist failures
 // never abort the run.
-func runAgent(ctx context.Context, deps RunDeps, template string, sessionID string, node *models.AgentNode, emit EmitFunc) error {
+func runAgent(ctx context.Context, deps RunDeps, template string, sessionID string, node *models.AgentNode, pauseOnFail bool, emit EmitFunc) error {
 	cfg, err := deps.llmConfig()
 	if err != nil {
 		return err
@@ -169,14 +197,18 @@ func runAgent(ctx context.Context, deps RunDeps, template string, sessionID stri
 			Status:      "error",
 			Error:       err.Error(),
 			Output: models.AgentOutputData{
-				Findings:      []models.Finding{},
-				OpenQuestions: []string{},
+				Findings:         []models.Finding{},
+				OpenQuestions:    []string{},
+				PsdContributions: []models.PsdContribution{},
 			},
 		}
 		if appendErr := deps.DB.AppendAgentOutput(sessionID, errored, node.ID, models.StatusError); appendErr != nil {
 			return fmt.Errorf("persist agent error %s: %w (original: %v)", node.AgentID, appendErr, err)
 		}
 		emit("agent_error", map[string]any{"agent_id": node.AgentID, "error": err.Error()})
+		if pauseOnFail {
+			return &ErrRunPaused{AgentID: node.AgentID, Cause: err}
+		}
 		return nil
 	}
 

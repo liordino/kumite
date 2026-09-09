@@ -90,6 +90,10 @@ type PipelinePlan struct {
 	ProjectType ProjectType     `json:"project_type"`
 	Pipeline    PipelineWaves   `json:"pipeline"`
 	Context     PipelineContext `json:"context"`
+	// Runner policy (client-set in the builder, not a Shishō output field):
+	// pause the run when a specialist fails, instead of continuing past it.
+	// Persists on the plan so a resume keeps the same policy.
+	PauseOnFail bool `json:"pause_on_fail"`
 }
 
 // AllNodes returns the plan's nodes in execution order: Wave 1, Wave 2, Fixed.

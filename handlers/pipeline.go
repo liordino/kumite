@@ -338,6 +338,26 @@ func (s *Server) run(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, http.StatusConflict, "session is in phase "+string(sess.Phase))
 		return
 	}
+
+	// Optional JSON body: {"pause_on_fail": true} — the policy persists on
+	// the plan so a resume keeps it. Empty body = keep the current policy.
+	var opts struct {
+		PauseOnFail *bool `json:"pause_on_fail"`
+	}
+	if r.Body != nil && r.ContentLength != 0 {
+		if err := decodeJSON(r, &opts); err != nil {
+			writeErr(w, http.StatusBadRequest, "invalid JSON body: "+err.Error())
+			return
+		}
+		if opts.PauseOnFail != nil && sess.PipelinePlan != nil {
+			sess.PipelinePlan.PauseOnFail = *opts.PauseOnFail
+			if err := s.DB.SavePlan(id, sess.PipelinePlan); err != nil {
+				writeErr(w, http.StatusInternalServerError, err.Error())
+				return
+			}
+		}
+	}
+
 	s.startRun(w, r, id, false)
 }
 

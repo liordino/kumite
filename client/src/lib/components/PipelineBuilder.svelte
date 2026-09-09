@@ -10,7 +10,7 @@
 		plan: PipelinePlan;
 		busy?: boolean;
 		onSave: (plan: PipelinePlan) => void;
-		onStart: () => void;
+		onStart: (pauseOnFail: boolean) => void;
 	} = $props();
 
 	// Local editable copy — nothing is sent until Save. No pipeline logic
@@ -104,6 +104,14 @@
 			error = String(e);
 		}
 	}
+
+	async function run() {
+		// Save-then-run: an unsaved plan modification (including the pause
+		// policy) must reach the backend before the run starts.
+		if (dirty) await save();
+		if (error) return;
+		onStart(working.pause_on_fail ?? false);
+	}
 </script>
 
 <section class="rounded border border-zinc-300 bg-white">
@@ -125,11 +133,20 @@
 			>
 				Save changes
 			</button>
+			<label class="flex items-center gap-2 text-sm text-zinc-400">
+				<input
+					type="checkbox"
+					class="h-3.5 w-3.5"
+					bind:checked={working.pause_on_fail}
+					onchange={() => (dirty = true)}
+				/>
+				Pause the run if a specialist fails
+			</label>
 			<button
 				type="button"
 				class="rounded bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50"
 				disabled={busy}
-				onclick={onStart}
+				onclick={run}
 			>
 				Run panel
 			</button>

@@ -148,7 +148,7 @@
 		await reload();
 	}
 
-	async function startRun(resume = false) {
+	async function startRun(resume = false, pauseOnFail = false) {
 		if (!session) return;
 		busy = true;
 		runError = '';
@@ -157,7 +157,12 @@
 		liveThinking = {};
 		livePhase = 'running';
 		try {
-			await streamRun(resume ? api.resume(session.id) : api.run(session.id), handleRunEvent);
+			await streamRun(
+				resume
+					? api.resume(session.id)
+					: api.run(session.id, { pause_on_fail: pauseOnFail }),
+				handleRunEvent
+			);
 		} catch (e) {
 			runError = String(e);
 		} finally {
@@ -317,7 +322,9 @@
 					plan={session.pipeline_plan}
 					busy={busy}
 					onSave={savePlan}
-					onStart={() => startRun(false)}
+					onStart={(p: boolean) => {
+						void startRun(false, p);
+					}}
 				/>
 			{/key}
 		{:else if (phase === 'running' || phase === 'synthesis') && session.pipeline_plan}

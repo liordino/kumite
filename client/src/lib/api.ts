@@ -75,6 +75,7 @@ export interface PipelineContext {
 
 export interface PipelinePlan {
 	session_id: string;
+	pause_on_fail?: boolean;
 	project_name: string;
 	input_type: string;
 	project_type: string;
@@ -230,8 +231,19 @@ export const api = {
 	updatePlan(id: string, plan: PipelinePlan): Promise<{ ok: boolean }> {
 		return request("PATCH", `/api/pipeline/${id}/plan`, plan);
 	},
-	run(id: string): Promise<Response> {
-		return fetch(`/api/pipeline/run/${id}`, { method: "POST" });
+	run(
+		id: string,
+		opts?: { pause_on_fail?: boolean }
+	): Promise<Response> {
+		return fetch(`/api/pipeline/run/${id}`, {
+			method: "POST",
+			headers:
+				opts === undefined
+					? undefined
+					: { "Content-Type": "application/json" },
+			body:
+				opts === undefined ? undefined : JSON.stringify(opts)
+		});
 	},
 	resume(id: string): Promise<Response> {
 		return fetch(`/api/pipeline/resume/${id}`, { method: "POST" });
