@@ -11,13 +11,13 @@
 {#if thinking}
 	<button
 		type="button"
-		class="text-xs text-zinc-500 underline hover:text-zinc-100"
+		class="text-xs text-zinc-500 underline hover:text-stone-900"
 		aria-expanded={expanded}
 		onclick={() => onToggle(agentId)}
 	>
 		{expanded ? 'Hide' : 'Show'} thinking
 	</button>
 	{#if expanded}
-		<pre class="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded bg-zinc-900/50 p-2 text-xs text-zinc-400">{thinking}</pre>
+		<pre class="mt-1 max-h-64 overflow-auto whitespace-pre-wrap rounded bg-white p-2 text-xs text-stone-500">{thinking}</pre>
 	{/if}
 {/if}

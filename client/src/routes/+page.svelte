@@ -52,10 +52,10 @@
 </script>
 
 <div class="mx-auto max-w-3xl space-y-6">
-	<section class="rounded border border-zinc-800 bg-zinc-900">
-		<header class="border-b border-zinc-800 px-4 py-3">
-			<h2 class="text-sm font-semibold text-zinc-100">New evaluation</h2>
-			<p class="mt-1 text-sm text-zinc-400">
+	<section class="rounded border border-stone-300 bg-white">
+		<header class="border-b border-stone-300 px-4 py-3">
+			<h2 class="text-sm font-semibold text-stone-900">New evaluation</h2>
+			<p class="mt-1 text-sm text-stone-500">
 				Submit a project idea — a one-line concept, a written brief, a transcript of conversations
 				with AI models, or an existing PSD. The panel decides whether it is worth building.
 			</p>
@@ -68,32 +68,32 @@
 			}}
 		>
 			<div>
-				<label class="block text-sm font-medium text-zinc-200" for="project-name">
+				<label class="block text-sm font-medium text-stone-800" for="project-name">
 					Project name <span class="font-normal text-zinc-500">(optional — a name is derived if empty)</span>
 				</label>
 				<input
 					id="project-name"
 					type="text"
-					class="mt-1 w-full rounded border border-zinc-700 px-3 py-2 text-sm focus:border-zinc-700 focus:outline-none"
+					class="mt-1 w-full rounded border border-stone-300 px-3 py-2 text-sm focus:border-stone-300 focus:outline-none"
 					bind:value={projectName}
 					placeholder="Field Ledger"
 				/>
 			</div>
 			<div>
-				<label class="block text-sm font-medium text-zinc-200" for="raw-input">Project material</label>
+				<label class="block text-sm font-medium text-stone-800" for="raw-input">Project material</label>
 				<textarea
 					id="raw-input"
-					class="mt-1 h-40 w-full rounded border border-zinc-700 px-3 py-2 font-mono text-sm focus:border-zinc-700 focus:outline-none"
+					class="mt-1 h-40 w-full rounded border border-stone-300 px-3 py-2 font-mono text-sm focus:border-stone-300 focus:outline-none"
 					bind:value={rawInput}
 					placeholder="Paste the brief, transcript, or concept here…"
 				></textarea>
 			</div>
 			{#if error}
-				<p class="text-sm text-red-400">{error}</p>
+				<p class="text-sm text-red-700">{error}</p>
 			{/if}
 			<button
 				type="submit"
-				class="rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-zinc-300 disabled:opacity-50"
+				class="rounded bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-700 disabled:opacity-50"
 				disabled={busy}
 			>
 				Create session
@@ -102,7 +102,7 @@
 	</section>
 
 	<section class="space-y-3">
-		<h2 class="text-sm font-semibold text-zinc-100">Sessions</h2>
+		<h2 class="text-sm font-semibold text-stone-900">Sessions</h2>
 		{#if loaded}
 			<SessionList sessions={sessions} onDelete={remove} />
 		{:else}

@@ -231,67 +231,67 @@
 <div class="mx-auto max-w-4xl space-y-6">
 	{#snippet statusIcon(status: AgentNode['status'])}
 		{#if status === 'running'}
-			<span class="inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-400"></span>
+			<span class="inline-block h-3 w-3 shrink-0 animate-spin rounded-full border-2 border-stone-300 border-t-stone-400"></span>
 		{:else if status === 'done'}
-			<span class="shrink-0 text-sm font-medium text-green-500">✓</span>
+			<span class="shrink-0 text-sm font-medium text-green-700">✓</span>
 		{:else if status === 'error'}
-			<span class="shrink-0 text-sm font-medium text-red-400">✗</span>
+			<span class="shrink-0 text-sm font-medium text-red-700">✗</span>
 		{:else if status === 'skipped'}
-			<span class="shrink-0 text-sm text-zinc-400">—</span>
+			<span class="shrink-0 text-sm text-stone-500">—</span>
 		{:else}
-			<span class="inline-block h-2.5 w-2.5 shrink-0 rounded-full border-2 border-zinc-800"></span>
+			<span class="inline-block h-2.5 w-2.5 shrink-0 rounded-full border-2 border-stone-300"></span>
 		{/if}
 	{/snippet}
 
 	{#snippet statusText(status: AgentNode['status'])}
 		{#if status === 'running'}
-			<span class="text-zinc-100">analyzing…</span>
+			<span class="text-stone-900">analyzing…</span>
 		{:else if status === 'done'}
 			<span class="text-zinc-500">done</span>
 		{:else if status === 'error'}
-			<span class="text-red-400">failed — the run continued</span>
+			<span class="text-red-700">failed — the run continued</span>
 		{:else if status === 'skipped'}
-			<span class="text-zinc-400">skipped</span>
+			<span class="text-stone-500">skipped</span>
 		{:else}
-			<span class="text-zinc-400">pending</span>
+			<span class="text-stone-500">pending</span>
 		{/if}
 	{/snippet}
 
 	<p class="text-xs text-zinc-500">
-		<a class="underline hover:text-zinc-100" href="/">← All sessions</a>
+		<a class="underline hover:text-stone-900" href="/">← All sessions</a>
 	</p>
 
 	{#if loadError}
-		<p class="rounded border border-red-900 bg-red-950/50 px-4 py-3 text-sm text-red-300">{loadError}</p>
+		<p class="rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">{loadError}</p>
 	{:else if !session}
 		<p class="text-sm text-zinc-500">Loading…</p>
 	{:else}
-		<header class="rounded border border-zinc-800 bg-zinc-900 px-4 py-3">
+		<header class="rounded border border-stone-300 bg-white px-4 py-3">
 			<div class="flex flex-wrap items-baseline justify-between gap-2">
-				<h1 class="text-lg font-semibold text-zinc-100">{session.project_name}</h1>
+				<h1 class="text-lg font-semibold text-stone-900">{session.project_name}</h1>
 				<span class="text-xs text-zinc-500">{phase}</span>
 			</div>
-			<p class="mt-1 text-sm text-zinc-400">{phaseText[phase]}</p>
+			<p class="mt-1 text-sm text-stone-500">{phaseText[phase]}</p>
 			{#if nowRunning}
-				<p class="mt-2 flex items-center gap-2 text-sm text-zinc-300">
-					<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-400"></span>
+				<p class="mt-2 flex items-center gap-2 text-sm text-stone-700">
+					<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-300 border-t-stone-400"></span>
 					Now analyzing: {nowRunning.display_name}
 				</p>
 			{/if}
 			{#if runError}
-				<p class="mt-2 rounded border border-red-900 bg-red-950/50 px-3 py-2 text-sm text-red-300">
+				<p class="mt-2 rounded border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
 					{runError}
 				</p>
 			{/if}
 			{#if pauseNotice}
-				<p class="mt-2 rounded border border-amber-900/50 bg-amber-950/30 px-3 py-2 text-sm text-amber-300">
+				<p class="mt-2 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
 					{pauseNotice}
 				</p>
 			{/if}
 			{#if phase === 'interrupted'}
 				<button
 					type="button"
-					class="mt-3 rounded bg-orange-600 px-3 py-1.5 text-sm font-medium text-zinc-950 hover:bg-orange-500"
+					class="mt-3 rounded bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700"
 					disabled={busy}
 					onclick={() => startRun(true)}
 				>
@@ -309,19 +309,19 @@
 			/>
 			<section class="flex flex-wrap items-center justify-end gap-3">
 				{#if busy}
-					<p class="mr-auto flex items-center gap-2 text-sm text-zinc-400">
-						<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-400"></span>
+					<p class="mr-auto flex items-center gap-2 text-sm text-stone-500">
+						<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-300 border-t-stone-400"></span>
 						Shishō is classifying the input and proposing the panel — a real model call, this can take a minute.
 					</p>
 				{/if}
 				<button
 					type="button"
-					class="flex items-center gap-2 rounded bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-950 hover:bg-zinc-300 disabled:opacity-50"
+					class="flex items-center gap-2 rounded bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-700 disabled:opacity-50"
 					disabled={busy}
 					onclick={runPhase0}
 				>
 					{#if busy}
-						<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-600 border-t-transparent"></span>
+						<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-400 border-t-transparent"></span>
 						Classifying…
 					{:else}
 						Run Phase 0 — classify and propose panel
@@ -342,16 +342,16 @@
 		{:else if (phase === 'running' || phase === 'synthesis') && session.pipeline_plan}
 			<section class="space-y-4">
 				{#each waveGroups as wave (wave.title)}
-					<div class="rounded border border-zinc-800 bg-zinc-900">
-						<h3 class="border-b border-zinc-800 px-4 py-2 text-xs font-medium tracking-wide text-zinc-500 uppercase">{wave.title}</h3>
+					<div class="rounded border border-stone-300 bg-white">
+						<h3 class="border-b border-stone-300 px-4 py-2 text-xs font-medium tracking-wide text-zinc-500 uppercase">{wave.title}</h3>
 						{#if wave.nodes.length === 0}
 							<p class="px-4 py-3 text-sm text-zinc-500">No agents in this wave.</p>
 						{:else}
-							<ul class="divide-y divide-zinc-800">
+							<ul class="divide-y divide-stone-200">
 								{#each wave.nodes as node (node.id)}
 									<li class="flex items-center gap-3 px-4 py-2">
 										{@render statusIcon(node.status)}
-										<span class="flex-1 text-sm {node.status === 'running' ? 'font-medium text-zinc-100' : 'text-zinc-300'}">{node.display_name}</span>
+										<span class="flex-1 text-sm {node.status === 'running' ? 'font-medium text-stone-900' : 'text-stone-700'}">{node.display_name}</span>
 										{@render statusText(node.status)}
 									</li>
 									{#if node.status === 'running' && liveThinking[node.agent_id]}
@@ -371,9 +371,9 @@
 				{/each}
 
 				{#if phase === 'synthesis'}
-					<div class="rounded border border-zinc-800 bg-zinc-900 px-4 py-3">
-						<p class="flex items-center gap-2 text-sm text-zinc-300">
-							<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-400"></span>
+					<div class="rounded border border-stone-300 bg-white px-4 py-3">
+						<p class="flex items-center gap-2 text-sm text-stone-700">
+							<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-300 border-t-stone-400"></span>
 							Shishō is synthesizing the Project Summary Document…
 						</p>
 					</div>
@@ -385,23 +385,23 @@
 		{:else if phase === 'complete'}
 			{#if session.psd}
 				<PsdPanel psd={session.psd} />
-				<section class="rounded border border-zinc-800 bg-zinc-900 px-4 py-3">
+				<section class="rounded border border-stone-300 bg-white px-4 py-3">
 					<div class="flex flex-wrap items-center justify-between gap-3">
 						<div>
-							<h2 class="text-sm font-semibold text-zinc-100">Dojo handoff bundle</h2>
-							<p class="mt-1 text-sm text-zinc-400">
+							<h2 class="text-sm font-semibold text-stone-900">Dojo handoff bundle</h2>
+							<p class="mt-1 text-sm text-stone-500">
 								Reframe the verdict as a Dojo feasibility brief plus a CONTEXT.md seed —
 								ready for Dojo&apos;s /hajime.
 							</p>
 						</div>
 						<button
 							type="button"
-							class="flex items-center gap-2 rounded border border-zinc-700 px-3 py-1.5 text-sm font-medium text-zinc-200 hover:bg-zinc-900 disabled:opacity-50"
+							class="flex items-center gap-2 rounded border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-800 hover:bg-stone-100 disabled:opacity-50"
 							disabled={handoffBusy}
 							onclick={generateHandoff}
 						>
 							{#if handoffBusy}
-								<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-zinc-600 border-t-transparent"></span>
+								<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-400 border-t-transparent"></span>
 							{/if}
 							{handoffBusy ? 'Generating…' : 'Generate bundle'}
 						</button>
@@ -410,18 +410,18 @@
 						<div class="mt-3 space-y-3">
 							<div>
 								<p class="mb-1 text-xs font-medium tracking-wide text-zinc-500 uppercase">BRIEF.md</p>
-								<pre class="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-zinc-900/50 p-3 text-xs leading-relaxed text-zinc-300">{handoffBundle.brief_md}</pre>
+								<pre class="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-white p-3 text-xs leading-relaxed text-stone-700">{handoffBundle.brief_md}</pre>
 							</div>
 							<div>
 								<p class="mb-1 text-xs font-medium tracking-wide text-zinc-500 uppercase">CONTEXT.md seed</p>
-								<pre class="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-zinc-900/50 p-3 text-xs leading-relaxed text-zinc-300">{handoffBundle.context_md}</pre>
+								<pre class="max-h-96 overflow-auto whitespace-pre-wrap rounded bg-white p-3 text-xs leading-relaxed text-stone-700">{handoffBundle.context_md}</pre>
 							</div>
 						</div>
 					{/if}
 				</section>
 			{/if}
 			<section class="space-y-3">
-				<h2 class="text-sm font-semibold text-zinc-100">Specialist outputs</h2>
+				<h2 class="text-sm font-semibold text-stone-900">Specialist outputs</h2>
 				{#each session.agent_outputs as output (output.agent_id)}
 					<AgentCard
 						output={output}
@@ -432,7 +432,7 @@
 			</section>
 		{:else if phase === 'interrupted' && session.pipeline_plan}
 			<section class="space-y-3">
-				<h2 class="text-sm font-semibold text-zinc-100">Preserved results</h2>
+				<h2 class="text-sm font-semibold text-stone-900">Preserved results</h2>
 				{#each session.agent_outputs as output (output.agent_id)}
 					<AgentCard
 						output={output}
