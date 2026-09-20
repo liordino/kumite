@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# bin/release <major|minor|patch> — kumite's release entrypoint.
+#
+# Standardised contract: the name and argument shape are the contract; this
+# implementation is kumite's own. The semver level is the CALLER's judgment,
+# never inferred here. Refuses loudly on any unmet precondition; never proceeds
+# half-way. Does not communicate: no push, no upload, no message — the artifact
+# lands where this script says, publishing is the human's act.
+#
+# Deviations from the dojo-skills sketch (recorded 2026-09-20):
+#   - Integration line is "autonomous", not "main" (kumite's main is an empty
+#     scaffold; the real line carries the work). The check targets
+#     KUMITE_INTEGRATION_BRANCH, default "autonomous".
+#   - No git remote exists; the published-tag check runs when a remote exists
+#     and is skipped with a printed note when none does.
+#   - Version home is version.json (no version existed anywhere before this).
+set -euo pipefail
+
+INTEGRATION_BRANCH="${KUMITE_INTEGRATION_BRANCH:-autonomous}"
+VERSION_FILE="version.json"
+ARTIFACT_OUT="${KUMITE_ARTIFACT_OUT:-dist/kumite.exe}"
+
+refuse() { echo "bin/release: REFUSED — $*" >&2; exit 1; }
+die()    { echo "bin/release: ERROR — $*" >&2; exit 1; }
+
+[ $# -eq 1 ] || { echo "usage: bin/release major|minor|patch" >&2; exit 2; }
+level="$1"
+case "$level" in
+  major|minor|patch) ;;
+  *) echo "bin/release: unknown level '$level' (want: major|minor|patch)" >&2; exit 2 ;;
+esac
+
+# --- Preconditions (refuse loudly, before any mutation) ---
+
+[ "$(git branch --show-current)" = "$INTEGRATION_BRANCH" ] \
+  || refuse "not on the integration line '$INTEGRATION_BRANCH' (on '$(git branch --show-current)')"
+
+# Clean-tree check ignores the gate's own outputs: .dojo/ (proof artifacts)
+# and dist/ (this script's artifact output). Uncommitted source still refuses.
+[ -z "$(git status --porcelain -- . ':(exclude).dojo' ':(exclude)dist')" ] \
+  || refuse "working tree dirty — commit or clean first; a release tags a clean tree only"
+
+[ -f "$VERSION_FILE" ] || die "version file '$VERSION_FILE' missing — cannot compute the next version"
+current=$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([0-9]*\.[0-9]*\.[0-9]*\)".*/\1/p' "$VERSION_FILE")
+[ -n "$current" ] || die "could not read a semver from $VERSION_FILE"
+IFS=. read -r v_major v_minor v_patch <<EOF
+$current
+EOF
+case "$level" in
+  major) next="$((v_major+1)).0.0" ;;
+  minor) next="$v_major.$((v_minor+1)).0" ;;
+  patch) next="$v_major.$v_minor.$((v_patch+1))" ;;
+esac
+tag="v$next"
+
+git rev-parse -q --verify "refs/tags/$tag" >/dev/null 2>&1 \
+  && refuse "tag $tag already exists locally"
+
+if git remote >/dev/null 2>&1 && [ -n "$(git remote)" ]; then
+  git ls-remote --tags origin "refs/tags/$tag" 2>/dev/null | grep -q . \
+    && refuse "tag $tag is already published on origin"
+else
+  echo "bin/release: note — no git remote; published-tag check skipped (local check only)"
+fi
+
+# Fresh proof over the exact tree being tagged — a stale green is not a gate.
+PROOF=".dojo/proof/check-proof"
+[ -f "$PROOF" ] || refuse "no proof artifact at $PROOF — run scripts/dojo-check.sh on this tree first"
+grep -q '^exit=0$' "$PROOF" || refuse "last proof did not pass — run scripts/dojo-check.sh"
+proof_tree=$(sed -n 's/^tree_sha256=//p' "$PROOF")
+here_tree=$(printf '%s:%s' "$(git rev-parse HEAD)" "$(git status --porcelain -- . ':(exclude).dojo' ':(exclude)dist' | sha256sum | awk '{print $1}')" | sha256sum | awk '{print $1}')
+[ -n "$proof_tree" ] || refuse "proof does not seal a tree (no tree_sha256) — re-run scripts/dojo-check.sh"
+[ "$proof_tree" = "$here_tree" ] || refuse "proof is not over the exact tree being tagged — re-run scripts/dojo-check.sh on the current tree"
+
+# --- Mechanical sequence ---
+next_content=$(printf '{"version": "%s"}' "$next")
+echo "$next_content" > "$VERSION_FILE"
+git add "$VERSION_FILE"
+git commit -q -m "chore(release): v$next"
+git tag "$tag"
+
+mkdir -p "$(dirname "$ARTIFACT_OUT")"
+go build -ldflags "-X main.Version=$next" -o "$ARTIFACT_OUT" .
+
+echo "bin/release: version  $current -> $next"
+echo "bin/release: tag      $tag (on $(git rev-parse --short HEAD))"
+echo "bin/release: artifact $ARTIFACT_OUT"
+echo "bin/release: stamped  main.Version=$next"
+echo "bin/release: NOT pushed, NOT published, NOT announced — publishing is the human's act."

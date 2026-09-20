@@ -30,6 +30,9 @@ import (
 //go:embed roster/agents.json
 var rosterJSON []byte
 
+// Version is stamped at release build time via -ldflags "-X main.Version=<ver>".
+var Version = "dev"
+
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
