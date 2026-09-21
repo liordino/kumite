@@ -32,15 +32,15 @@
 	}
 </script>
 
-<div class="overflow-x-auto rounded border border-stone-300 bg-white">
-	<table class="w-full text-sm">
+<div class="overflow-x-auto rounded-none border border-stone-300 bg-white">
+	<table class="tabular w-full text-sm">
 		<thead>
-			<tr class="border-b border-stone-300 bg-white text-left text-xs font-medium tracking-wide text-zinc-500 uppercase">
-				<th class="px-4 py-2">Project</th>
-				<th class="px-4 py-2">Phase</th>
-				<th class="px-4 py-2">Domain</th>
-				<th class="px-4 py-2">Findings</th>
-				<th class="px-4 py-2">Updated</th>
+			<tr class="border-b border-stone-300 bg-white text-left text-xs font-medium tracking-wide text-stone-500 uppercase">
+				<th class="display px-4 py-2">Project</th>
+				<th class="display px-4 py-2">Phase</th>
+				<th class="display px-4 py-2">Domain</th>
+				<th class="display px-4 py-2">Findings</th>
+				<th class="display px-4 py-2">Updated</th>
 				<th class="px-4 py-2"><span class="sr-only">Actions</span></th>
 			</tr>
 		</thead>

@@ -52,9 +52,9 @@
 	}
 </script>
 
-<section class="rounded border border-stone-300 bg-white">
-	<header class="border-b border-stone-300 px-4 py-3">
-		<h2 class="text-sm font-semibold text-stone-900">Intake — Uchikomi</h2>
+<section class="rounded-none border border-stone-300 bg-white">
+	<header class="rule-division border-b border-stone-300 px-4 py-3">
+		<h2 class="display text-base font-bold text-stone-900">Intake — Uchikomi</h2>
 		<p class="mt-1 text-sm text-stone-500">
 			Decide how the panel reads your material. This choice is yours; the system only explains
 			the trade-off.

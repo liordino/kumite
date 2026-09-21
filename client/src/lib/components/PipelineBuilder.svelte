@@ -115,10 +115,10 @@
 	}
 </script>
 
-<section class="rounded border border-stone-300 bg-white">
-	<header class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-300 px-4 py-3">
+<section class="rounded-none border border-stone-300 bg-white">
+	<header class="rule-division flex flex-wrap items-center justify-between gap-3 border-b border-stone-300 px-4 py-3">
 		<div>
-			<h2 class="text-sm font-semibold text-stone-900">Proposed panel</h2>
+			<h2 class="display text-base font-bold text-stone-900">Proposed panel</h2>
 			<p class="mt-0.5 text-xs text-zinc-500">
 				{working.project_name} · {working.context.domain} · input: {working.input_type} ·
 				maturity: {working.context.maturity}
@@ -128,7 +128,7 @@
 		<div class="flex items-center gap-3">
 			<button
 				type="button"
-				class="rounded border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-800 hover:bg-stone-100 disabled:opacity-50"
+				class="display rounded-none border border-stone-300 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-stone-800 hover:bg-stone-100 disabled:opacity-50"
 				disabled={!dirty || busy}
 				onclick={save}
 			>
@@ -145,7 +145,7 @@
 			</label>
 			<button
 				type="button"
-				class="rounded bg-stone-900 px-3 py-1.5 text-sm font-medium text-stone-50 hover:bg-stone-700 disabled:opacity-50"
+				class="display rounded-none bg-stone-900 px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-stone-50 hover:bg-stone-700 disabled:opacity-50"
 				disabled={busy}
 				onclick={run}
 			>
@@ -164,7 +164,7 @@
 	{/if}
 
 	<div class="border-b border-stone-300 px-4 py-3">
-		<h3 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">Classification</h3>
+		<h3 class="display text-xs font-semibold uppercase tracking-widest text-stone-500">Classification</h3>
 		<p class="mt-1 text-sm text-stone-700">{working.context.problem_statement}</p>
 		<dl class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
 			{#each fourBlock as block (block.label)}
@@ -185,7 +185,7 @@
 
 	{#each [{ title: 'Wave 1 — independent analysis', nodes: working.pipeline.wave1, other: working.pipeline.wave2 }, { title: 'Wave 2 — reactive analysis', nodes: working.pipeline.wave2, other: working.pipeline.wave1 }] as wave (wave.title)}
 		<div class="border-b border-stone-300 px-4 py-3">
-			<h3 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">{wave.title}</h3>
+			<h3 class="display text-xs font-semibold uppercase tracking-widest text-stone-800">{wave.title}</h3>
 			{#if wave.nodes.length === 0}
 				<p class="mt-2 text-sm text-zinc-500">No agents in this wave.</p>
 			{/if}
@@ -250,7 +250,7 @@
 	</div>
 
 	<div class="px-4 py-3">
-		<h3 class="text-xs font-medium tracking-wide text-zinc-500 uppercase">
+		<h3 class="display text-xs font-semibold uppercase tracking-widest text-stone-500">
 			Fixed — challenges every finding (cannot be changed)
 		</h3>
 		<ul class="mt-2 space-y-2">

@@ -257,7 +257,7 @@
 		{/if}
 	{/snippet}
 
-	<p class="text-xs text-zinc-500">
+	<p class="text-xs text-stone-500 tabular">
 		<a class="underline hover:text-stone-900" href="/">← All sessions</a>
 	</p>
 
@@ -266,15 +266,15 @@
 	{:else if !session}
 		<p class="text-sm text-zinc-500">Loading…</p>
 	{:else}
-		<header class="rounded border border-stone-300 bg-white px-4 py-3">
+		<header class="rule-division rounded-none border border-stone-300 bg-white px-4 py-3">
 			<div class="flex flex-wrap items-baseline justify-between gap-2">
-				<h1 class="text-lg font-semibold text-stone-900">{session.project_name}</h1>
-				<span class="text-xs text-zinc-500">{phase}</span>
+				<h1 class="display text-xl font-bold text-stone-900">{session.project_name}</h1>
+				<span class="display text-xs uppercase tracking-widest text-stone-500">{phase}</span>
 			</div>
 			<p class="mt-1 text-sm text-stone-500">{phaseText[phase]}</p>
 			{#if nowRunning}
-				<p class="mt-2 flex items-center gap-2 text-sm text-stone-700">
-					<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-300 border-t-stone-400"></span>
+				<p class="mt-2 flex items-center gap-2 text-sm font-medium text-stone-900">
+					<span class="bout-live inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-300"></span>
 					Now analyzing: {nowRunning.display_name}
 				</p>
 			{/if}
@@ -291,7 +291,7 @@
 			{#if phase === 'interrupted'}
 				<button
 					type="button"
-					class="mt-3 rounded bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700"
+					class="display mt-3 rounded-none bg-orange-700 px-3 py-1.5 text-sm font-bold uppercase tracking-wider text-orange-50 hover:bg-orange-800"
 					disabled={busy}
 					onclick={() => startRun(true)}
 				>
@@ -309,14 +309,14 @@
 			/>
 			<section class="flex flex-wrap items-center justify-end gap-3">
 				{#if busy}
-					<p class="mr-auto flex items-center gap-2 text-sm text-stone-500">
+					<span class="display mr-auto flex items-center gap-2 text-sm text-stone-500 uppercase text-xs tracking-wide">
 						<span class="inline-block h-3 w-3 animate-spin rounded-full border-2 border-stone-300 border-t-stone-400"></span>
 						Shishō is classifying the input and proposing the panel — a real model call, this can take a minute.
-					</p>
+					</span>
 				{/if}
 				<button
 					type="button"
-					class="flex items-center gap-2 rounded bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-700 disabled:opacity-50"
+					class="display flex items-center gap-2 rounded-none bg-stone-900 px-4 py-2 text-sm font-bold uppercase tracking-wider text-stone-50 hover:bg-stone-700 disabled:opacity-50"
 					disabled={busy}
 					onclick={runPhase0}
 				>
@@ -342,8 +342,8 @@
 		{:else if (phase === 'running' || phase === 'synthesis') && session.pipeline_plan}
 			<section class="space-y-4">
 				{#each waveGroups as wave (wave.title)}
-					<div class="rounded border border-stone-300 bg-white">
-						<h3 class="border-b border-stone-300 px-4 py-2 text-xs font-medium tracking-wide text-zinc-500 uppercase">{wave.title}</h3>
+				<div class="rule-division border border-stone-300 bg-white">
+					<h3 class="display border-b border-stone-300 px-4 py-2 text-xs font-bold uppercase tracking-widest text-stone-800">{wave.title}</h3>
 						{#if wave.nodes.length === 0}
 							<p class="px-4 py-3 text-sm text-zinc-500">No agents in this wave.</p>
 						{:else}
@@ -396,7 +396,7 @@
 						</div>
 						<button
 							type="button"
-							class="flex items-center gap-2 rounded border border-stone-300 px-3 py-1.5 text-sm font-medium text-stone-800 hover:bg-stone-100 disabled:opacity-50"
+							class="display flex items-center gap-2 rounded-none border border-stone-300 px-3 py-1.5 text-sm font-semibold uppercase tracking-wider text-stone-800 hover:bg-stone-100 disabled:opacity-50"
 							disabled={handoffBusy}
 							onclick={generateHandoff}
 						>

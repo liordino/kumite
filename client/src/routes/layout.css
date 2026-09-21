@@ -1,1 +1,131 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/archivo';
+
+/* Kumite — Tournament Ledger theme.
+   The scoresheet stays warm paper with visible ink; the tournament register
+   comes from the display face (Archivo), the vermilion seal, and the
+   scorecard division rules. Tokens live here as CSS variables so components
+   can stay Tailwind-classed. */
+
+:root {
+	--font-display: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+	--paper: #f5f5f4;      /* stone-100 */
+	--panel: #ffffff;
+	--line: #d6d3d1;       /* stone-300 */
+	--ink: #1c1917;        /* stone-900 */
+	--seal: #c2410c;       /* orange-700 — the bout is live / you must act */
+}
+
+body {
+	font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Display voice: headings, bylines, section numerals, the seal. */
+.display {
+	font-family: var(--font-display);
+	font-variation-settings: 'wdth' 92;
+	letter-spacing: -0.01em;
+}
+
+/* Scorecard division: a heavy rule above, hairline below — the double rule
+   a printed scorecard uses to open a division. */
+.rule-division {
+	border-top: 3px solid var(--ink);
+	box-shadow: 0 1px 0 0 var(--line, #d6d3d1);
+}
+
+/* The vermilion seal: a square stamp, like the hanko on an official record. */
+.seal {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--seal);
+	color: #fff7ed;
+	font-family: var(--font-display);
+	font-weight: 700;
+}
+
+/* --- Browser surfaces, themed from the palette --- */
+
+::selection {
+	background: #1c1917;
+	color: #fafaf9;
+}
+
+* {
+	caret-color: var(--ink);
+}
+
+*::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+*::-webkit-scrollbar-track {
+	background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+	background: var(--line);
+	border-radius: 0;
+}
+*::-webkit-scrollbar-thumb:hover {
+	background: #a8a29e; /* stone-400 */
+}
+
+:focus-visible {
+	outline: 2px solid var(--ink);
+	outline-offset: 2px;
+}
+
+input,
+textarea,
+select {
+	border-radius: 0;
+}
+
+/* Numerals in tabular data: aligned columns on the scoresheet. */
+.tabular {
+	font-variant-numeric: tabular-nums;
+}
+
+/* --- Motion: one authored moment — the live bout. The spinner's ring
+   carries a vermilion pen stroke that pulses while the bout runs. --- */
+
+@keyframes bout-live {
+	0%,
+	100% {
+		border-top-color: var(--seal);
+		transform: scale(1);
+	}
+	50% {
+		border-top-color: #ffedd5; /* orange-100 */
+		transform: scale(1.12);
+	}
+}
+
+.bout-live {
+	animation: bout-live 1.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+/* Section bodies of the PSD settle in once, on open. Exponential ease-out
+   from an already-visible default — no entrance on scroll, no stagger. */
+@keyframes settle {
+	from {
+		opacity: 0.4;
+		transform: translateY(2px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.settle {
+	animation: settle 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.bout-live,
+	.settle {
+		animation: none;
+	}
+}
