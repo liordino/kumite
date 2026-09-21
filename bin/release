@@ -63,7 +63,12 @@ else
   echo "bin/release: note — no git remote; published-tag check skipped (local check only)"
 fi
 
-# Fresh proof over the exact tree being tagged — a stale green is not a gate.
+# Fresh proof over the tree the release is CUT FROM — a stale green is not a gate.
+# Scope of the seal, stated exactly: scripts/dojo-check.sh attests the tree
+# BEFORE the version-bump commit and tag exist. The bump commit and tag change
+# the tree hash; they are mechanical (version.json + tag name, verified by
+# release-asserts.sh) and are NOT re-attested by the proof. So the proof covers
+# the tree the release was cut from, not the tagged commit itself.
 PROOF=".dojo/proof/check-proof"
 [ -f "$PROOF" ] || refuse "no proof artifact at $PROOF — run scripts/dojo-check.sh on this tree first"
 grep -q '^exit=0$' "$PROOF" || refuse "last proof did not pass — run scripts/dojo-check.sh"
@@ -86,4 +91,5 @@ echo "bin/release: version  $current -> $next"
 echo "bin/release: tag      $tag (on $(git rev-parse --short HEAD))"
 echo "bin/release: artifact $ARTIFACT_OUT"
 echo "bin/release: stamped  main.Version=$next"
+echo "bin/release: proof    sealed over the pre-bump tree ($proof_tree); the bump commit + tag are mechanical, not re-attested"
 echo "bin/release: NOT pushed, NOT published, NOT announced — publishing is the human's act."
