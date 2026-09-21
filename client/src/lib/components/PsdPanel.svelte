@@ -81,22 +81,27 @@
 	{/each}
 {/snippet}
 
-<article class="overflow-hidden rounded border border-stone-300 bg-white">
-	<header class="flex flex-wrap items-center justify-between gap-3 border-b border-stone-300 px-6 py-4">
+<article class="overflow-hidden border border-stone-300 bg-white">
+	<header class="rule-division flex flex-wrap items-center justify-between gap-3 border-b border-stone-300 px-6 py-4">
 		<div>
-			<p class="text-[10px] font-semibold tracking-[0.2em] text-zinc-500 uppercase">Project Summary Document</p>
-			{#if parsed.title}
-				<h2 class="mt-0.5 text-base font-semibold text-stone-900">{parsed.title}</h2>
-			{/if}
+			<div class="flex items-center gap-3">
+				<span class="seal h-9 w-9 text-lg" title="Official verdict">判</span>
+				<div>
+					<p class="display text-xs font-bold uppercase tracking-[0.2em] text-stone-900">Project Summary Document</p>
+					{#if parsed.title}
+						<h2 class="display mt-0.5 text-lg font-bold text-stone-900">{parsed.title}</h2>
+					{/if}
+				</div>
+			</div>
 			{#if panelByline.length > 0}
-				<p class="mt-1.5 text-[10px] font-medium tracking-widest text-zinc-500 uppercase">
+				<p class="display mt-1.5 text-[10px] font-medium uppercase tracking-widest text-stone-500">
 					Panel — {panelByline.join(' · ')}
 				</p>
 			{/if}
 		</div>
 		<button
 			type="button"
-			class="rounded border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700 hover:bg-stone-100"
+			class="display rounded-none border border-stone-300 px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-stone-700 hover:bg-stone-100"
 			onclick={() => download()}
 		>
 			Download .md
@@ -115,12 +120,12 @@
 	{#each renderedSections as section, i (section.text)}
 		<details class="border-b border-stone-300 last:border-b-0" open={i < 2}>
 			<summary class="flex cursor-pointer items-center gap-3 px-6 py-3 text-sm select-none">
-				<span class="flex h-7 w-7 shrink-0 items-center justify-center border border-stone-300 text-xs font-semibold text-stone-700">
+				<span class="display flex h-7 w-7 shrink-0 items-center justify-center border border-stone-300 bg-stone-100 text-sm font-bold tabular text-stone-800">
 					{section.num || '·'}
 				</span>
-				<span class="font-semibold text-stone-900">{section.text}</span>
+				<span class="display font-semibold text-stone-900">{section.text}</span>
 			</summary>
-			<div class="px-6 pb-5 pl-16">
+			<div class="settle px-6 pb-5 pl-16">
 				{#if section.blocks.length === 0}
 					<p class="text-sm text-zinc-500 italic">_No panel contribution for this section._</p>
 				{:else}

@@ -71,9 +71,9 @@
 </script>
 
 <div class="mx-auto max-w-3xl space-y-6">
-	<section class="rounded border border-stone-300 bg-white">
-		<header class="border-b border-stone-300 px-4 py-3">
-			<h2 class="text-sm font-semibold text-stone-900">Inference provider</h2>
+	<section class="rounded-none border border-stone-300 bg-white">
+		<header class="rule-division border-b border-stone-300 px-4 py-3">
+			<h2 class="display text-base font-bold text-stone-900">Inference provider</h2>
 			<p class="mt-1 text-sm text-stone-500">
 				Any OpenAI-compatible endpoint works. Changes take effect on the next LLM call — no restart.
 			</p>
@@ -128,9 +128,9 @@
 		</form>
 	</section>
 
-	<section class="rounded border border-stone-300 bg-white">
-		<header class="border-b border-stone-300 px-4 py-3">
-			<h2 class="text-sm font-semibold text-stone-900">Custom agents</h2>
+	<section class="rounded-none border border-stone-300 bg-white">
+		<header class="rule-division border-b border-stone-300 px-4 py-3">
+			<h2 class="display text-base font-bold text-stone-900">Custom agents</h2>
 			<p class="mt-1 text-sm text-stone-500">
 				User-defined specialists. Shishō can select them like built-in agents, and you can add them
 				to a panel in the builder.

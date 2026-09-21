@@ -1,6 +1,23 @@
 # Kumite — design system
 
-## The philosophy
+## The tournament ledger — the philosophy
+
+Kumite (組手) is sparring: an idea enters the floor, the panel tests it, what survives is stronger. The interface is a **judges' scoresheet** from that tournament — warm white paper, visible ink, nothing shouting. The reader is the judge at the table: they read findings the way judges read scorecards, in long stretches, under scrutiny. Every element earns its place the way a technique does: no wasted motion, no decoration, no noise.
+
+The product's output is text — findings, classifications, verdicts. The design's job is to make seventy findings scannable in one sitting, not to impress on first glance.
+
+## The tournament register (identity layer, added with the "Tournament Ledger" direction)
+
+The scoresheet alone was too plain — stationery without a tournament. The personality comes from four committed moves, all earned by the sparring frame:
+
+- **A display face.** Archivo (self-hosted, `@fontsource-variable/archivo`), condensed width axis at 92, carries every heading, byline, uppercase micro-line, and primary button. The body stays system-ui — the document voice reads, the ledger voice rules. Weight 700–800 in display positions, never the platform sans as the display voice.
+- **The vermilion seal.** A square stamp (`判` on the PSD, `組` in the header) in orange-700 — the hanko on an official record. It marks only the two things that are official: the app's identity and the verdict itself. It is the same color family the theme already reserved for "the bout is live" and Resume; the seal is its printed form.
+- **The scorecard division rule.** `rule-division` — a 3px ink rule over a hairline — opens every division: app header, the intake card, the PSD header, each wave, section headers in settings. It is the printed double rule of a scorecard, not decoration.
+- **One authored motion.** The live bout: the running agent's spinner ring pulses vermilion (`bout-live`, exponential ease). The PSD section body settles in once on open (`settle`). Nothing else moves; `prefers-reduced-motion` stills both.
+
+Browser surfaces are themed from the palette in `layout.css`: ink-on-paper text selection, stone scrollbars (square, like cut paper), ink caret, visible ink focus rings, tabular numerals in every table and count. Square corners everywhere — a printed sheet has no rounded corners.
+
+## The philosophy of the base scoresheet
 
 Kumite (組手) is sparring: an idea enters the floor, the panel tests it, what survives is stronger. The interface is a **judges' scoresheet** from that tournament — warm white paper, visible ink, nothing shouting. The reader is the judge at the table: they read findings the way judges read scorecards, in long stretches, under scrutiny. Every element earns its place the way a technique does: no wasted motion, no decoration, no noise.
 

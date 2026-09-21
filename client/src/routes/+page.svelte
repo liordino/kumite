@@ -52,9 +52,9 @@
 </script>
 
 <div class="mx-auto max-w-3xl space-y-6">
-	<section class="rounded border border-stone-300 bg-white">
-		<header class="border-b border-stone-300 px-4 py-3">
-			<h2 class="text-sm font-semibold text-stone-900">New evaluation</h2>
+	<section class="border border-stone-300 bg-white">
+		<header class="rule-division border-b border-stone-300 px-4 py-4">
+			<h2 class="display text-lg font-bold text-stone-900">New evaluation</h2>
 			<p class="mt-1 text-sm text-stone-500">
 				Submit a project idea — a one-line concept, a written brief, a transcript of conversations
 				with AI models, or an existing PSD. The panel decides whether it is worth building.
@@ -93,16 +93,16 @@
 			{/if}
 			<button
 				type="submit"
-				class="rounded bg-stone-900 px-4 py-2 text-sm font-medium text-stone-50 hover:bg-stone-700 disabled:opacity-50"
+				class="display rounded-none bg-stone-900 px-5 py-2 text-sm font-bold uppercase tracking-wider text-stone-50 hover:bg-stone-700 disabled:opacity-50"
 				disabled={busy}
 			>
-				Create session
+				Submit to the panel
 			</button>
 		</form>
 	</section>
 
 	<section class="space-y-3">
-		<h2 class="text-sm font-semibold text-stone-900">Sessions</h2>
+		<h2 class="display text-base font-bold text-stone-900">Sessions</h2>
 		{#if loaded}
 			<SessionList sessions={sessions} onDelete={remove} />
 		{:else}
