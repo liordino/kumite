@@ -17,12 +17,6 @@ The scoresheet alone was too plain — stationery without a tournament. The pers
 
 Browser surfaces are themed from the palette in `layout.css`: ink-on-paper text selection, stone scrollbars (square, like cut paper), ink caret, visible ink focus rings, tabular numerals in every table and count. Square corners everywhere — a printed sheet has no rounded corners.
 
-## The philosophy of the base scoresheet
-
-Kumite (組手) is sparring: an idea enters the floor, the panel tests it, what survives is stronger. The interface is a **judges' scoresheet** from that tournament — warm white paper, visible ink, nothing shouting. The reader is the judge at the table: they read findings the way judges read scorecards, in long stretches, under scrutiny. Every element earns its place the way a technique does: no wasted motion, no decoration, no noise.
-
-The product's output is text — findings, classifications, verdicts. The design's job is to make seventy findings scannable in one sitting, not to impress on first glance.
-
 ## Surfaces
 
 | Token | Class | Role |

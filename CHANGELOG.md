@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- README: what Kumite is, the five stages, how to run and test it, and a map
+  of the spec documents.
+
+### Changed
+
+- Frontend identity redesign — the "Tournament Ledger" direction: Archivo
+  display face (self-hosted, condensed width axis), vermilion seal marks on
+  the app header and the PSD, scorecard division rules, square corners,
+  themed browser surfaces (selection, scrollbars, caret, focus), tabular
+  numerals, and two authored motions (`bout-live`, `settle`) that honor
+  `prefers-reduced-motion`.
+
+### Fixed
+
+- DESIGN.md: the scoresheet philosophy paragraph had been duplicated by the
+  redesign (once under the tournament-ledger philosophy, once under the base
+  scoresheet); it now appears once.
+- A humanizer audit ran across README, spec docs, DESIGN.md prose, client UI
+  copy, and code comments. No prose changes were required; no code comments
+  were touched. The guarantee-bearing comments in `bin/release` and
+  `scripts/dojo-check.sh` were reviewed and kept at full strength.
+
 ## [0.2.0] — 2026-09-21
 
 First published release. Everything listed is new since project inception —
